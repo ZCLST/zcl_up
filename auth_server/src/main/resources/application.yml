@@ -1,0 +1,56 @@
+server:
+  port: 8174
+spring:
+  application:
+    name: authserver # 应用名称，会在Eureka中显示
+  #Mysql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/zf?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&&failOverReadOnly=false
+    username: root
+    password: root
+#eureka配置
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8071/eureka/
+  instance:
+    prefer-ip-address: true # 当调用gapplication.ymletHostname获取实例的hostname时，返回ip而不是host名称
+#持久层 mybatis-plus
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: full
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    cache-enabled: false #禁用缓存
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.zcl.anth.*.model #实体对象扫描，减少xml编写
+
+feign:
+  compression:
+    request:
+      enabled: true #开启请求压缩
+      mime-types: application/json,text/html #设置压缩的数据类型
+      min-request-size: 2048 #设置触发压缩的最小下限
+    response:
+      enabled: true #开启响应压缩
+  #配置feign的日志输出
+  #  NONE：不输出日志（性能高） BASIC：适用于生产环境的问题追踪
+  #  HEADERS:在BASIC的基础上记录请求和响应头信息 FULL：记录所有
+  client:
+    config:
+      productserver: #指明查看服务日志名称
+        loggerLevel: FULL
+  #开启hystrix
+  hystrix:
+    enabled: true
+    command:
+      default:
+        execution:
+          isolation:
+            thread:
+              timeoutInMilliseconds: 3000 #默认连接超时时间为1秒
+logging:
+  level:
+    com.zcl.anth.user.feign.MenuFeignClient: debug
+

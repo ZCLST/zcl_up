@@ -1,0 +1,12 @@
+server:
+  port: 8171
+spring:
+  application:
+    name: productserver # 应用名称，会在Eureka中显示
+#eureka配置
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8071/eureka/
+  instance:
+    prefer-ip-address: true # 当调用gapplication.ymletHostname获取实例的hostname时，返回ip而不是host名称

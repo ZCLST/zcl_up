@@ -1,0 +1,27 @@
+server:
+  port: 8173
+spring:
+  application:
+    name: basicserver # 应用名称，会在Eureka中显示
+  #Mysql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/zf?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&&failOverReadOnly=false
+    username: root
+    password: root
+#eureka配置
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8071/eureka/
+  instance:
+    prefer-ip-address: true # 当调用gapplication.ymletHostname获取实例的hostname时，返回ip而不是host名称
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: full
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    cache-enabled: false #禁用缓存
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.zcl.basic.*.model #实体对象扫描，减少xml编写
+
