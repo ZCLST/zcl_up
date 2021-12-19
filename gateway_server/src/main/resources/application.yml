@@ -32,3 +32,5 @@ logging:
     com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver: WARN
 #白名单
 whitelist: /404,/authserver/userController/checkUser.form,/authserver/MenuController/getMenuByUser.json
+#是否开启网关拦截
+onswitch: false

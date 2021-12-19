@@ -12,7 +12,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
  * @desc    GateWay网关微服务
  **/
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.zcl")
 @EnableEurekaClient
 public class GateWayApplication {
     public static void main(String[] args) {

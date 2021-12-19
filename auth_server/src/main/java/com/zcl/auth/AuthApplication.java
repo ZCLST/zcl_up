@@ -15,8 +15,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableEurekaClient
 @EnableFeignClients
 @MapperScan("com.zcl.auth.*.mapper*")
-public class AuthAppliaction {
+public class AuthApplication {
     public static void main(String[] args) {
-        SpringApplication.run(AuthAppliaction.class, args);
+        SpringApplication.run(AuthApplication.class, args);
     }
 }

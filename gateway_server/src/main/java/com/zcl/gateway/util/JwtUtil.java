@@ -1,4 +1,4 @@
-package com.zcl.util.general.util;
+package com.zcl.gateway.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;

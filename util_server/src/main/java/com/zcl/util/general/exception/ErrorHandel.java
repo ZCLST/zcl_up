@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author 曾小白
@@ -37,11 +40,21 @@ public class ErrorHandel {
     }
     @ExceptionHandler(value = ZfException.class)
     @ResponseBody
-    public Map MyExceptinoHandle(ZfException e){
+    public Map myExceptionHandle(ZfException e){
         Map map = new HashMap<>();
         map.put("code", ErrorCodeEnum.SYSERROR.getCode());
         map.put("status", false);
         map.put("msg", e.getMsg());
+        log.error("异常：【{}】", e);
+        return map;
+    }
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    @ResponseBody
+    public Map constraintViolationExceptionHandle(ConstraintViolationException e){
+        Map map = new HashMap<>();
+        map.put("code", ErrorCodeEnum.SYSERROR.getCode());
+        map.put("status", false);
+        System.out.println(e.getMessage());
         log.error("异常：【{}】", e);
         return map;
     }
