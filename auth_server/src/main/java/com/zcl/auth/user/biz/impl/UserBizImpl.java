@@ -40,7 +40,7 @@ public class UserBizImpl implements UserBiz {
     @Override
     public Map checkUserLogin(LoginRequest loginRequest) {
         try {
-            String uName = loginRequest.getUName();
+            String uName = loginRequest.getuName();
             String password = loginRequest.getPassword();
             //对密码加密
             String md5Pw = MD5Util.EncoderByMd5(password);

@@ -24,7 +24,7 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     cache-enabled: false #禁用缓存
   mapper-locations: classpath*:mapper/**/*Mapper.xml
-  type-aliases-package: com.zcl.anth.*.model #实体对象扫描，减少xml编写
+  type-aliases-package: com.zcl.auth.*.model #实体对象扫描，减少xml编写
 
 feign:
   compression:

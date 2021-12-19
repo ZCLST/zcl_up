@@ -18,4 +18,11 @@ public interface UserService {
      * @return
      */
     User findUserByNameAndPassWord(String uName, String password);
+
+    /**
+     * 根据UId查询用户
+     * @param uId
+     * @return
+     */
+    User findUserByUid(String uId);
 }

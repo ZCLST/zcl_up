@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcl.auth.menu.mapper.MenuMapper">
+    <select id="selectMenusByRid" resultType="com.zcl.auth.menu.model.Menu">
+        select m.*
+        from t_role r
+                 join t_user_role ur
+                      on r.r_id = ur.r_id
+                 join t_menu m
+                      on ur.m_id = m.m_id
+        where r.r_id = #{rId}
+          and is_navigation = '0'
+        order by m.m_sort, m.m_name desc
+    </select>
+
+</mapper>

@@ -54,7 +54,7 @@ public class ErrorHandel {
         Map map = new HashMap<>();
         map.put("code", ErrorCodeEnum.SYSERROR.getCode());
         map.put("status", false);
-        System.out.println(e.getMessage());
+        map.put("msg", e.getMessage());
         log.error("异常：【{}】", e);
         return map;
     }
