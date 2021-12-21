@@ -1,16 +1,17 @@
 package com.zcl.auth.user.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zcl.auth.user.biz.UserBiz;
+import com.zcl.auth.user.model.User;
 import com.zcl.auth.user.request.LoginRequest;
+import com.zcl.auth.user.request.UserPageRequest;
+import com.zcl.auth.user.request.UserRequest;
 import com.zcl.auth.user.vo.UserTokenVo;
 import com.zcl.util.general.enums.StatusEnum;
 import com.zcl.util.general.response.CommonResponse;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -41,5 +42,26 @@ public class UserController {
     @RequestMapping(value = "/checkUser.form", method = RequestMethod.POST)
     public Map<String, Object> checkUser(@RequestBody LoginRequest loginRequest) {
         return userBiz.checkUserLogin(loginRequest);
+    }
+
+    /**
+     * 分页动态查询用户
+     *
+     * @param userPageRequest
+     * @return
+     */
+    @PostMapping("/listUser.json")
+    public Map<String, Object> listUser(@RequestBody UserPageRequest userPageRequest) {
+        return userBiz.listUser(userPageRequest);
+    }
+
+    /**
+     * 添加用户
+     * @param userRequest
+     * @return
+     */
+    @PostMapping("/addOrUpdateUser.json")
+    public Map<String,Object> addUser(@RequestBody UserRequest userRequest){
+        return userBiz.addOrUpdateUser(userRequest);
     }
 }

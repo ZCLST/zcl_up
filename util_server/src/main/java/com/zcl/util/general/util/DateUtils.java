@@ -7,10 +7,10 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * 获取当前时间工具类
+ * 时间工具类
  * @return
  */
-public abstract class DateInFo {
+public abstract class DateUtils {
     //获取当前时间
     public static String getNowTime(){
         Date date = new Date();

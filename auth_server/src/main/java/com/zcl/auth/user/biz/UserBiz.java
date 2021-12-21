@@ -3,6 +3,8 @@ package com.zcl.auth.user.biz;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zcl.auth.user.model.User;
 import com.zcl.auth.user.request.LoginRequest;
+import com.zcl.auth.user.request.UserPageRequest;
+import com.zcl.auth.user.request.UserRequest;
 import com.zcl.auth.user.vo.UserTokenVo;
 import com.zcl.util.general.enums.StatusEnum;
 import com.zcl.util.general.response.CommonResponse;
@@ -26,4 +28,18 @@ public interface UserBiz {
      * @return
      */
     Map checkUserLogin(@Valid LoginRequest loginRequest);
+
+    /**
+     * 动态分页查询用户
+     * @param userPageRequest
+     * @return
+     */
+    Map<String, Object> listUser(UserPageRequest userPageRequest);
+
+    /**
+     * 添加用户
+     * @param userRequest
+     * @return
+     */
+    Map<String, Object> addOrUpdateUser(@Valid UserRequest userRequest);
 }

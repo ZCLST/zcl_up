@@ -1,27 +1,31 @@
 package com.zcl.auth.user.biz.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zcl.auth.user.biz.UserBiz;
 import com.zcl.auth.user.model.User;
 import com.zcl.auth.user.request.LoginRequest;
+import com.zcl.auth.user.request.UserPageRequest;
+import com.zcl.auth.user.request.UserRequest;
 import com.zcl.auth.user.service.UserService;
 import com.zcl.auth.user.vo.UserTokenVo;
 import com.zcl.util.general.enums.StatusEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
-import com.zcl.util.general.util.JedisUtil;
-import com.zcl.util.general.util.JwtUtil;
-import com.zcl.util.general.util.MD5Util;
-import com.zcl.util.general.util.TokenUtil;
+import com.zcl.util.general.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 
+import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author zcl
@@ -67,5 +71,38 @@ public class UserBizImpl implements UserBiz {
             log.error(e.getMessage());
             throw new ZfException("用户名或密码不正确");
         }
+    }
+
+    @Override
+    public Map<String, Object> listUser(UserPageRequest userPageRequest) {
+        IPage<User> userPage = new Page<>(userPageRequest.getPageIndex(), userPageRequest.getPageSize());
+        IPage<User> userIPage = userService.listUser(userPage, userPageRequest);
+        return CommonResponse.setResponseData(userIPage);
+    }
+
+    @Override
+    public Map<String, Object> addOrUpdateUser(@Valid UserRequest userRequest) {
+        //获取当前时间
+        String nowTime = DateUtils.getNowTime();
+        User convert = BeanUtil.convert(userRequest, User.class);
+        //判断用户名是否存在
+        List<User> users = userService.listUsers();
+        List<User> collect_user = users.stream().filter(u ->
+                StringUtils.equals(u.getuName(), convert.getuName())).collect(Collectors.toList());
+        User user = userService.findUserByUid(convert.getuId());
+        if (user == null) {//新增
+            if(collect_user.size()!=0){
+                throw new ZfException(convert.getuName()+":用户名已经存在");
+            }
+            convert.setCreateTime(nowTime);
+            userService.saveUser(convert);
+        } else {//更新
+            if(collect_user.size()>1){
+                throw new ZfException(convert.getuName()+":用户名已经存在");
+            }
+            user.setUpdateTime(nowTime);
+            userService.updateUser(user);
+        }
+        return CommonResponse.setResponseData(null);
     }
 }
