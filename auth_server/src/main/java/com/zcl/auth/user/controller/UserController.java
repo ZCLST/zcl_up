@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,7 +63,18 @@ public class UserController {
      * @return
      */
     @PostMapping("/addOrUpdateUser.json")
-    public Map<String,Object> addUser(@RequestBody UserRequest userRequest){
+    public Map<String,Object> addOrUpdateUser(@RequestBody UserRequest userRequest){
         return userBiz.addOrUpdateUser(userRequest);
+    }
+
+    /**
+     * 根据uId批量删除用户
+     * @param uIds
+     * @return
+     */
+    @PostMapping("/deleteBatchUser.json")
+    public Map<String,Object> deleteBatchUser(@RequestBody String[] uIds){
+        List<String> uid_list = Arrays.asList(uIds);
+        return userBiz.deleteBatchUser(uid_list);
     }
 }

@@ -11,6 +11,7 @@ import com.zcl.util.general.response.CommonResponse;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,4 +43,11 @@ public interface UserBiz {
      * @return
      */
     Map<String, Object> addOrUpdateUser(@Valid UserRequest userRequest);
+
+    /**
+     * 根据uId批量删除用户
+     * @param uid_list
+     * @return
+     */
+    Map<String, Object> deleteBatchUser(List<String> uid_list);
 }

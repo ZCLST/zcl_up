@@ -56,4 +56,10 @@ public interface UserService {
      * @return
      */
     List<User> listUsers();
+
+    /**
+     * 根据uId批量删除用户
+     * @param uid_list
+     */
+    void deleteBatchUser(List<String> uid_list);
 }

@@ -17,6 +17,7 @@ import com.zcl.util.general.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Jedis;
 
 import javax.validation.Valid;
@@ -91,18 +92,25 @@ public class UserBizImpl implements UserBiz {
                 StringUtils.equals(u.getuName(), convert.getuName())).collect(Collectors.toList());
         User user = userService.findUserByUid(convert.getuId());
         if (user == null) {//新增
-            if(collect_user.size()!=0){
-                throw new ZfException(convert.getuName()+":用户名已经存在");
+            if (collect_user.size() != 0) {
+                throw new ZfException(convert.getuName() + ":用户名已经存在");
             }
             convert.setCreateTime(nowTime);
             userService.saveUser(convert);
         } else {//更新
-            if(collect_user.size()>1){
-                throw new ZfException(convert.getuName()+":用户名已经存在");
+            if (collect_user.size() > 1) {
+                throw new ZfException(convert.getuName() + ":用户名已经存在");
             }
             user.setUpdateTime(nowTime);
             userService.updateUser(user);
         }
+        return CommonResponse.setResponseData(null);
+    }
+
+    @Override
+    public Map<String, Object> deleteBatchUser(List<String> uid_list) {
+        if (CollectionUtils.isEmpty(uid_list)) throw new ZfException("用户ID不能为空");
+        userService.deleteBatchUser(uid_list);
         return CommonResponse.setResponseData(null);
     }
 }

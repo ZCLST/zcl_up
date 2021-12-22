@@ -56,4 +56,9 @@ public class UserServiceImpl implements UserService {
     public List<User> listUsers() {
         return userMapper.selectList(new QueryWrapper<>());
     }
+
+    @Override
+    public void deleteBatchUser(List<String> uid_list) {
+        userMapper.deleteBatchIds(uid_list);
+    }
 }

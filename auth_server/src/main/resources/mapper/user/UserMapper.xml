@@ -6,10 +6,10 @@
         from t_user
         <where>
             1=1
-            <if test="userPageVo.userName!=null and userPageVo.userName!=''">
+            <if test="userPageRequest.userName!=null and userPageRequest.userName!=''">
                 and u_name like CONCAT('%', #{userPageRequest.userName}, '%')
             </if>
-            <if test="userPageVo.roleId!=null and userPageVo.roleId!=''">
+            <if test="userPageRequest.roleId!=null and userPageRequest.roleId!=''">
                 and r_id = #{userPageRequest.roleId}
             </if>
         </where>
