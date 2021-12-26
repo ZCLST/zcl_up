@@ -50,4 +50,11 @@ public interface UserBiz {
      * @return
      */
     Map<String, Object> deleteBatchUser(List<String> uid_list);
+
+    /**
+     * 根据UID查询用户
+     * @param uId
+     * @return
+     */
+    Map<String, Object> findUserByUid(String uId);
 }

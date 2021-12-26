@@ -102,6 +102,11 @@ public class UserBizImpl implements UserBiz {
                 throw new ZfException(convert.getuName() + ":用户名已经存在");
             }
             user.setUpdateTime(nowTime);
+            user.setrId(convert.getrId());
+            user.setEmail(convert.getEmail());
+            user.setPhone(convert.getPhone());
+            user.setSex(convert.getSex());
+            user.setuName(convert.getuName());
             userService.updateUser(user);
         }
         return CommonResponse.setResponseData(null);
@@ -112,5 +117,14 @@ public class UserBizImpl implements UserBiz {
         if (CollectionUtils.isEmpty(uid_list)) throw new ZfException("用户ID不能为空");
         userService.deleteBatchUser(uid_list);
         return CommonResponse.setResponseData(null);
+    }
+
+    @Override
+    public Map<String, Object> findUserByUid(String uId) {
+        if(StringUtils.isBlank(uId)){
+            throw new ZfException("uId不能为空");
+        }
+        User user=userService.findUserByUid(uId);
+        return CommonResponse.setResponseData(user);
     }
 }

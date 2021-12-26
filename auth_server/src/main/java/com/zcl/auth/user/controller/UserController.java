@@ -1,16 +1,9 @@
 package com.zcl.auth.user.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zcl.auth.user.biz.UserBiz;
-import com.zcl.auth.user.model.User;
 import com.zcl.auth.user.request.LoginRequest;
 import com.zcl.auth.user.request.UserPageRequest;
 import com.zcl.auth.user.request.UserRequest;
-import com.zcl.auth.user.vo.UserTokenVo;
-import com.zcl.util.general.enums.StatusEnum;
-import com.zcl.util.general.response.CommonResponse;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -58,7 +51,7 @@ public class UserController {
     }
 
     /**
-     * 添加用户
+     * 添加或修改用户
      * @param userRequest
      * @return
      */
@@ -77,4 +70,14 @@ public class UserController {
         List<String> uid_list = Arrays.asList(uIds);
         return userBiz.deleteBatchUser(uid_list);
     }
+    /**
+     * 根据uId查询用户
+     * @param uId
+     * @return
+     */
+    @PostMapping("/findUserByUid.json")
+    public Map<String,Object> findUserByUid(@RequestBody String uId){
+        return userBiz.findUserByUid(uId);
+    }
+
 }

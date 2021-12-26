@@ -14,7 +14,7 @@ public abstract class DateUtils {
     //获取当前时间
     public static String getNowTime(){
         Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         String time = format.format(date);
         return time;
     }
