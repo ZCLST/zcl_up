@@ -1,5 +1,6 @@
 package com.zcl.auth.menu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zcl.auth.menu.mapper.MenuMapper;
 import com.zcl.auth.menu.model.Menu;
 import com.zcl.auth.menu.service.MenuService;
@@ -27,5 +28,10 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<Menu> selectMenusByRid(String rId) {
         return menuMapper.selectMenusByRid(rId);
+    }
+
+    @Override
+    public List<Menu> selectAllMenus() {
+        return menuMapper.selectList(new QueryWrapper<Menu>());
     }
 }

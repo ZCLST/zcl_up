@@ -25,4 +25,17 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @return
      */
     IPage<Role> selectPageRoles(@Param("rolePage") IPage<Role> rolePage,@Param("rolePageRequest") RolePageRequest rolePageRequest);
+
+    /**
+     * 根据rid删除绑定菜单
+     * @param rId
+     */
+    void deleteBindMenusByRid(String rId);
+
+    /**
+     * 根据rid绑定菜单
+     * @param mId
+     * @param rId
+     */
+    void insertBindMenus(String mId, String rId);
 }

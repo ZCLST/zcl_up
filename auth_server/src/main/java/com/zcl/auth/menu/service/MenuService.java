@@ -20,4 +20,10 @@ public interface MenuService {
      * @return
      */
     List<Menu> selectMenusByRid(String rId);
+
+    /**
+     * 查询所有菜单
+     * @return
+     */
+    List<Menu> selectAllMenus();
 }

@@ -3,6 +3,7 @@ package com.zcl.auth.menu.biz.impl;
 import com.zcl.auth.menu.biz.MenuBiz;
 import com.zcl.auth.menu.model.Menu;
 import com.zcl.auth.menu.service.MenuService;
+import com.zcl.auth.menu.vo.BindMenuTreeVo;
 import com.zcl.auth.menu.vo.MenuVo;
 import com.zcl.auth.user.model.User;
 import com.zcl.auth.user.service.UserService;
@@ -63,6 +64,29 @@ public class MenuBizImpl implements MenuBiz {
         //获取子菜单
         List<MenuVo> menuVos = this.getSubMenus(menus);
         return CommonResponse.setResponseData(menuVos);
+    }
+
+    @Override
+    public List<BindMenuTreeVo> getMenuByRid(String rId) {
+        //查询所有菜单
+        List<Menu> menuList=menuService.selectAllMenus();
+        //查询该角色菜单
+        List<Menu> menuListByRole = menuService.selectMenusByRid(rId);
+        List<BindMenuTreeVo> bindMenuTreeVos = BeanUtil.convertList(menuList, BindMenuTreeVo.class);
+        //根节点，二级父节点设置展开,该角色菜单进行默认选中
+        bindMenuTreeVos.stream().forEach(menuVo -> {
+            if ("0".equals(menuVo.getpId()) || "0".equals(menuVo.getId())) {
+                menuVo.setOpen(true);
+            }
+            for (Menu m :
+                    menuListByRole) {
+                if (m.getmId().equals(menuVo.getId())) {
+                    menuVo.setChecked(true);
+                    break;
+                }
+            }
+        });
+        return bindMenuTreeVos;
     }
 
     private List<MenuVo> getSubMenus( List<Menu> menus) {

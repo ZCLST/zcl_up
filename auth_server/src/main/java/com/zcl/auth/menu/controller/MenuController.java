@@ -1,12 +1,13 @@
 package com.zcl.auth.menu.controller;
 
 import com.zcl.auth.menu.biz.MenuBiz;
+import com.zcl.auth.menu.vo.BindMenuTreeVo;
+import com.zcl.auth.menu.vo.MenuVo;
 import com.zcl.util.general.response.CommonResponse;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 /**
 
@@ -35,4 +36,6 @@ public class MenuController {
     public Map<String, Object> getMenuByUser(HttpServletRequest httpServletRequest) {
         return menuBiz.getMenuByUser(httpServletRequest);
     }
+
+
 }
