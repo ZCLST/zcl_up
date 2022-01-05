@@ -37,5 +37,5 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @param mId
      * @param rId
      */
-    void insertBindMenus(String mId, String rId);
+    void insertBindMenus(@Param("mId") String mId,@Param("rId") String rId);
 }

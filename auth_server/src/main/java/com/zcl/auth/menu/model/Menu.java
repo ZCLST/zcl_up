@@ -88,6 +88,24 @@ public class Menu implements Serializable {
      */
     private String updateTime;
 
+    public Menu() {
+    }
+
+    public Menu(String mId, String mName, String pMenu, String isNavigation, String mUrl, String mIcon, Integer mSort, String mDesc, String createUser, String createTime, String updateUser, String updateTime) {
+        this.mId = mId;
+        this.mName = mName;
+        this.pMenu = pMenu;
+        this.isNavigation = isNavigation;
+        this.mUrl = mUrl;
+        this.mIcon = mIcon;
+        this.mSort = mSort;
+        this.mDesc = mDesc;
+        this.createUser = createUser;
+        this.createTime = createTime;
+        this.updateUser = updateUser;
+        this.updateTime = updateTime;
+    }
+
     public String getmId() {
         return mId;
     }

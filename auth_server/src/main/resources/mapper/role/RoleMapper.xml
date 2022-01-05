@@ -22,7 +22,7 @@
         where r_id = #{rId}
     </delete>
 
-    <insert id="insertBindMenvos">
+    <insert id="insertBindMenus">
         <selectKey keyProperty="rmId" resultType="java.lang.String" order="BEFORE">
             select REPLACE(UUID(),'-','')
         </selectKey>

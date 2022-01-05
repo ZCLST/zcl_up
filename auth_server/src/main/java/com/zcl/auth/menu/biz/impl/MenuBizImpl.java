@@ -69,10 +69,18 @@ public class MenuBizImpl implements MenuBiz {
     @Override
     public List<BindMenuTreeVo> getMenuByRid(String rId) {
         //查询所有菜单
-        List<Menu> menuList=menuService.selectAllMenus();
+        List<Menu> menuList = menuService.selectAllMenus();
         //查询该角色菜单
         List<Menu> menuListByRole = menuService.selectMenusByRid(rId);
-        List<BindMenuTreeVo> bindMenuTreeVos = BeanUtil.convertList(menuList, BindMenuTreeVo.class);
+        List<BindMenuTreeVo> bindMenuTreeVos = new ArrayList<>();
+        menuList.stream().forEach(menu -> {
+            BindMenuTreeVo bindMenuTreeVo = new BindMenuTreeVo();
+            bindMenuTreeVo.setId(menu.getmId());
+            bindMenuTreeVo.setpId(menu.getpMenu());
+            bindMenuTreeVo.setName(menu.getmName());
+            bindMenuTreeVo.setIcon(menu.getmIcon());
+            bindMenuTreeVos.add(bindMenuTreeVo);
+        });
         //根节点，二级父节点设置展开,该角色菜单进行默认选中
         bindMenuTreeVos.stream().forEach(menuVo -> {
             if ("0".equals(menuVo.getpId()) || "0".equals(menuVo.getId())) {
@@ -89,7 +97,7 @@ public class MenuBizImpl implements MenuBiz {
         return bindMenuTreeVos;
     }
 
-    private List<MenuVo> getSubMenus( List<Menu> menus) {
+    private List<MenuVo> getSubMenus(List<Menu> menus) {
         //获取一级菜单
         List<Menu> menuList = menus.stream().filter(menu -> "0".equals(menu.getpMenu())).collect(Collectors.toList());
         //一级菜单menuVo
