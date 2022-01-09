@@ -32,4 +32,10 @@ public interface MenuBiz {
      * @return
      */
     List<BindMenuTreeVo> getMenuByRid(@NotBlank(message = "rId不能为空") String rId);
+
+    /**
+     * 菜单管理获取所有菜单
+     * @return
+     */
+    Map<String, Object> selectAllMenus();
 }

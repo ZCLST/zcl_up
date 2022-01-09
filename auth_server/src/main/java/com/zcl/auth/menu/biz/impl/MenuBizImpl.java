@@ -1,9 +1,11 @@
 package com.zcl.auth.menu.biz.impl;
 
+import com.alibaba.druid.sql.visitor.functions.Bin;
 import com.zcl.auth.menu.biz.MenuBiz;
 import com.zcl.auth.menu.model.Menu;
 import com.zcl.auth.menu.service.MenuService;
 import com.zcl.auth.menu.vo.BindMenuTreeVo;
+import com.zcl.auth.menu.vo.BindMenuVueTreeVo;
 import com.zcl.auth.menu.vo.MenuVo;
 import com.zcl.auth.user.model.User;
 import com.zcl.auth.user.service.UserService;
@@ -96,6 +98,29 @@ public class MenuBizImpl implements MenuBiz {
         });
         return bindMenuTreeVos;
     }
+
+    @Override
+    public Map<String, Object> selectAllMenus() {
+        //查询所有菜单
+        List<Menu> menuList = menuService.selectAllMenus();
+        List<BindMenuVueTreeVo> bindMenuVueTreeVos = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(menuList)) {
+
+            menuList.stream().forEach(menu -> {
+                BindMenuVueTreeVo bindMenuVueTreeVo = new BindMenuVueTreeVo();
+                bindMenuVueTreeVo.setId(menu.getmId());
+                bindMenuVueTreeVo.setLable(menu.getmName());
+                bindMenuVueTreeVo.setPId(menu.getpMenu());
+                bindMenuVueTreeVos.add(bindMenuVueTreeVo);
+            });
+        }
+
+
+
+        return CommonResponse.setResponseData(null);
+    }
+
+
 
     private List<MenuVo> getSubMenus(List<Menu> menus) {
         //获取一级菜单

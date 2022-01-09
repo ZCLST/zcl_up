@@ -32,10 +32,17 @@ public class MenuController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/getMenuByUser.json", method = RequestMethod.GET)
+    @GetMapping(value = "/getMenuByUser.json")
     public Map<String, Object> getMenuByUser(HttpServletRequest httpServletRequest) {
         return menuBiz.getMenuByUser(httpServletRequest);
     }
 
-
+    /**
+     * 菜单管理获取所有菜单
+     * @return
+     */
+    @GetMapping(value = "/selectAllMenus.json")
+    public Map<String, Object> selectAllMenus() {
+        return menuBiz.selectAllMenus();
+    }
 }
