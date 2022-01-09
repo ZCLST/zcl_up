@@ -26,7 +26,7 @@ public class BindMenuVueTreeVo {
     /**
      * 菜单名称
      */
-    private String lable;
+    private String label;
     /**
      * 子菜单
      */

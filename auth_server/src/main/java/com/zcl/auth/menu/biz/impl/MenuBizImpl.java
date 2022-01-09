@@ -101,6 +101,7 @@ public class MenuBizImpl implements MenuBiz {
 
     @Override
     public Map<String, Object> selectAllMenus() {
+        List<BindMenuVueTreeVo> collect = new ArrayList<>();
         //查询所有菜单
         List<Menu> menuList = menuService.selectAllMenus();
         List<BindMenuVueTreeVo> bindMenuVueTreeVos = new ArrayList<>();
@@ -109,18 +110,70 @@ public class MenuBizImpl implements MenuBiz {
             menuList.stream().forEach(menu -> {
                 BindMenuVueTreeVo bindMenuVueTreeVo = new BindMenuVueTreeVo();
                 bindMenuVueTreeVo.setId(menu.getmId());
-                bindMenuVueTreeVo.setLable(menu.getmName());
+                bindMenuVueTreeVo.setLabel(menu.getmName());
                 bindMenuVueTreeVo.setPId(menu.getpMenu());
                 bindMenuVueTreeVos.add(bindMenuVueTreeVo);
             });
+            //生成菜单树
+            collect = bindMenuVueTreeVos.stream()
+                    // 查找根目录
+                    .filter(bm -> StringUtils.equals("0", bm.getId()))
+                    // 查找子菜单并放到第一级菜单中
+                    .map(bm -> {
+                        bm.setChildren(getChildren(bm, bindMenuVueTreeVos));
+                        return bm;
+                    })
+                    // 把处理结果收集成一个 List 集合
+                    .collect(Collectors.toList());
         }
-
-
-
-        return CommonResponse.setResponseData(null);
+        return CommonResponse.setResponseData(collect);
     }
 
 
+    /**
+     * 递归获取子菜单
+     *
+     * @param root 当前菜单
+     * @param all  总的数据
+     * @return 子菜单
+     */
+    public List<BindMenuVueTreeVo> getChildren(BindMenuVueTreeVo root, List<BindMenuVueTreeVo> all) {
+        List<BindMenuVueTreeVo> children = all.stream()
+                // 根据 父菜单 ID 查找当前菜单 ID，以便于找到 当前菜单的子菜单
+                .filter(menu -> StringUtils.equals(menu.getPId(),root.getId()))
+                // 递归查找子菜单的子菜单
+                .map((menu) -> {
+                    menu.setChildren(getChildren(menu, all));
+                    return menu;
+                })
+                // 把处理结果收集成一个 List 集合
+                .collect(Collectors.toList());
+        return children;
+    }
+
+//    /**
+//     * 递归获取子菜单
+//     * @param root 当前菜单
+//     * @param all 总的数据
+//     * @return 子菜单
+//     */
+//    public List<TreeMenu> getChildren(TreeMenu root, List<TreeMenu> all) {
+//        List<TreeMenu> children = all.stream()
+//                // 根据 父菜单 ID 查找当前菜单 ID，以便于找到 当前菜单的子菜单
+//                .filter(menu -> menu.getParentMenuId() == root.getMenuId())
+//                / 递归查找子菜单的子菜单
+//                .map((menu) -> {
+//                    menu.setTreeMenu(getChildren(menu, all));
+//                    return menu;
+//                })
+//                // 根据排序字段排序
+//                .sorted((menu1, menu2) -> {
+//                    return (menu1.getSort() == null ? 0 : menu1.getSort()) - (menu2.getSort() == null ? 0 : menu2.getSort());
+//                })
+//                // 把处理结果收集成一个 List 集合
+//                .collect(Collectors.toList());
+//        return children;
+//    }
 
     private List<MenuVo> getSubMenus(List<Menu> menus) {
         //获取一级菜单

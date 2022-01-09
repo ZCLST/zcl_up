@@ -32,6 +32,10 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menu> selectAllMenus() {
-        return menuMapper.selectList(new QueryWrapper<Menu>());
+        QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByAsc(Menu.M_SORT)
+                .orderByDesc(Menu.M_NAME);
+        return menuMapper.selectList(queryWrapper);
     }
+
 }
