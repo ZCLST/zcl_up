@@ -1,9 +1,12 @@
 package com.zcl.auth.menu.biz;
 
+import com.netflix.ribbon.proxy.annotation.Http;
+import com.zcl.auth.menu.request.MenuRequest;
 import com.zcl.auth.menu.vo.BindMenuTreeVo;
 import org.springframework.validation.annotation.Validated;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
@@ -38,4 +41,12 @@ public interface MenuBiz {
      * @return
      */
     Map<String, Object> selectAllMenus();
+
+    /**
+     * 新增菜单
+     * @param httpServletRequest
+     * @param menuRequest
+     * @return
+     */
+    Map<String, Object> addMenu(HttpServletRequest httpServletRequest,@Valid MenuRequest menuRequest);
 }

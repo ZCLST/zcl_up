@@ -26,4 +26,10 @@ public interface MenuService {
      * @return
      */
     List<Menu> selectAllMenus();
+
+    /**
+     * 新增菜单
+     * @param menu
+     */
+    void addMenu(Menu menu);
 }

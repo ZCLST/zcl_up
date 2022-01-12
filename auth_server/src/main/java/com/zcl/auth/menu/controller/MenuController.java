@@ -1,6 +1,7 @@
 package com.zcl.auth.menu.controller;
 
 import com.zcl.auth.menu.biz.MenuBiz;
+import com.zcl.auth.menu.request.MenuRequest;
 import com.zcl.auth.menu.vo.BindMenuTreeVo;
 import com.zcl.auth.menu.vo.MenuVo;
 import com.zcl.util.general.response.CommonResponse;
@@ -45,4 +46,13 @@ public class MenuController {
     public Map<String, Object> selectAllMenus() {
         return menuBiz.selectAllMenus();
     }
+    /**
+     * 新增菜单
+     * @return
+     */
+    @PostMapping(value = "/addMenu.json")
+    public Map<String, Object> addMenu(HttpServletRequest httpServletRequest,@RequestBody MenuRequest menuRequest) {
+        return menuBiz.addMenu(httpServletRequest,menuRequest);
+    }
+
 }

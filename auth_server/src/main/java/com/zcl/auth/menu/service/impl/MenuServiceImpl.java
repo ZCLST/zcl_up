@@ -9,13 +9,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
-
- * @author  zcl
-
- * @create  2021/12/19 13:49
-
- * @desc    菜单公共业务实现层
-
+ * @author zcl
+ * @create 2021/12/19 13:49
+ * @desc 菜单公共业务实现层
  **/
 @Service
 public class MenuServiceImpl implements MenuService {
@@ -36,6 +32,11 @@ public class MenuServiceImpl implements MenuService {
         queryWrapper.orderByAsc(Menu.M_SORT)
                 .orderByDesc(Menu.M_NAME);
         return menuMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public void addMenu(Menu menu) {
+        menuMapper.insert(menu);
     }
 
 }

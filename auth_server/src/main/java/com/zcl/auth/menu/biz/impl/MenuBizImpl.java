@@ -1,8 +1,10 @@
 package com.zcl.auth.menu.biz.impl;
 
 import com.alibaba.druid.sql.visitor.functions.Bin;
+import com.netflix.ribbon.proxy.annotation.Http;
 import com.zcl.auth.menu.biz.MenuBiz;
 import com.zcl.auth.menu.model.Menu;
+import com.zcl.auth.menu.request.MenuRequest;
 import com.zcl.auth.menu.service.MenuService;
 import com.zcl.auth.menu.vo.BindMenuTreeVo;
 import com.zcl.auth.menu.vo.BindMenuVueTreeVo;
@@ -13,6 +15,7 @@ import com.zcl.util.general.enums.ErrorCodeEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.BeanUtil;
+import com.zcl.util.general.util.DateUtils;
 import com.zcl.util.general.util.JedisUtil;
 import com.zcl.util.general.util.MapperFactoryUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -112,6 +115,9 @@ public class MenuBizImpl implements MenuBiz {
                 bindMenuVueTreeVo.setId(menu.getmId());
                 bindMenuVueTreeVo.setLabel(menu.getmName());
                 bindMenuVueTreeVo.setPId(menu.getpMenu());
+                bindMenuVueTreeVo.setIcon(menu.getmIcon());
+                bindMenuVueTreeVo.setDesc(menu.getmDesc());
+                bindMenuVueTreeVo.setUrl(menu.getmUrl());
                 bindMenuVueTreeVos.add(bindMenuVueTreeVo);
             });
             //生成菜单树
@@ -127,6 +133,18 @@ public class MenuBizImpl implements MenuBiz {
                     .collect(Collectors.toList());
         }
         return CommonResponse.setResponseData(collect);
+    }
+
+    @Override
+    public Map<String, Object> addMenu(HttpServletRequest httpServletRequest, MenuRequest menuRequest) {
+        Menu menu = BeanUtil.convert(menuRequest, Menu.class);
+        String token = httpServletRequest.getHeader("Authorization");
+        Jedis jedis = JedisUtil.getJedis();
+        String uId = jedis.get(token);
+        menu.setCreateTime(DateUtils.getNowTime());
+        menu.setCreateUser(uId);
+        menuService.addMenu(menu);
+        return CommonResponse.setResponseData(null);
     }
 
 
@@ -151,29 +169,7 @@ public class MenuBizImpl implements MenuBiz {
         return children;
     }
 
-//    /**
-//     * 递归获取子菜单
-//     * @param root 当前菜单
-//     * @param all 总的数据
-//     * @return 子菜单
-//     */
-//    public List<TreeMenu> getChildren(TreeMenu root, List<TreeMenu> all) {
-//        List<TreeMenu> children = all.stream()
-//                // 根据 父菜单 ID 查找当前菜单 ID，以便于找到 当前菜单的子菜单
-//                .filter(menu -> menu.getParentMenuId() == root.getMenuId())
-//                / 递归查找子菜单的子菜单
-//                .map((menu) -> {
-//                    menu.setTreeMenu(getChildren(menu, all));
-//                    return menu;
-//                })
-//                // 根据排序字段排序
-//                .sorted((menu1, menu2) -> {
-//                    return (menu1.getSort() == null ? 0 : menu1.getSort()) - (menu2.getSort() == null ? 0 : menu2.getSort());
-//                })
-//                // 把处理结果收集成一个 List 集合
-//                .collect(Collectors.toList());
-//        return children;
-//    }
+
 
     private List<MenuVo> getSubMenus(List<Menu> menus) {
         //获取一级菜单

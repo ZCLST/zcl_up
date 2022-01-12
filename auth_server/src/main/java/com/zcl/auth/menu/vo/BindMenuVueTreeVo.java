@@ -28,6 +28,18 @@ public class BindMenuVueTreeVo {
      */
     private String label;
     /**
+     * 菜单图标
+     */
+    private String icon;
+    /**
+     * 菜单描述
+     */
+    private String desc;
+    /**
+     * 菜单URL
+     */
+    private String url;
+    /**
      * 子菜单
      */
     private List<BindMenuVueTreeVo> children;
