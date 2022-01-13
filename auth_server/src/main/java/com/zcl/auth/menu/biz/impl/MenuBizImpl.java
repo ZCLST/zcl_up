@@ -27,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +146,15 @@ public class MenuBizImpl implements MenuBiz {
         menu.setCreateUser(uId);
         menuService.addMenu(menu);
         return CommonResponse.setResponseData(null);
+    }
+
+    @Override
+    public Map<String, Object> findMenuById(@NotBlank(message = "id不能为空") String id) {
+        Menu menu=menuService.findMenuById(id);
+        if(menu==null){
+            throw new ZfException("该菜单不存在");
+        }
+        return CommonResponse.setResponseData(menu);
     }
 
 

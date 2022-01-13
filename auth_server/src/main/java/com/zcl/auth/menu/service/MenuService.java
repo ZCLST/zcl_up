@@ -32,4 +32,11 @@ public interface MenuService {
      * @param menu
      */
     void addMenu(Menu menu);
+
+    /**
+     * 根据ID获取菜单
+     * @param id
+     * @return
+     */
+    Menu findMenuById(String id);
 }

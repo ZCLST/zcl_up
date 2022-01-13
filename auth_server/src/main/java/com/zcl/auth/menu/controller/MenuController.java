@@ -54,5 +54,12 @@ public class MenuController {
     public Map<String, Object> addMenu(HttpServletRequest httpServletRequest,@RequestBody MenuRequest menuRequest) {
         return menuBiz.addMenu(httpServletRequest,menuRequest);
     }
-
+    /**
+     * 根据ID获取菜单
+     * @return
+     */
+    @GetMapping(value = "/findMenuById.json")
+    public Map<String, Object> findMenuById(String id) {
+        return menuBiz.findMenuById(id);
+    }
 }

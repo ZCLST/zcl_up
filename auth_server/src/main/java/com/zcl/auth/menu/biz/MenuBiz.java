@@ -49,4 +49,11 @@ public interface MenuBiz {
      * @return
      */
     Map<String, Object> addMenu(HttpServletRequest httpServletRequest,@Valid MenuRequest menuRequest);
+
+    /**
+     * 根据ID获取菜单
+     * @param id
+     * @return
+     */
+    Map<String, Object> findMenuById(@NotBlank(message = "id不能为空") String id);
 }
