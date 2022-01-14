@@ -39,4 +39,24 @@ public interface MenuService {
      * @return
      */
     Menu findMenuById(String id);
+
+    /**
+     * 根据id查找子菜单
+     * @param id
+     * @return
+     */
+    List<Menu> selectSubMenusById(String id);
+
+    /**
+     * 根据id批量删除菜单
+     * @param ids
+     */
+    void deleteMenuByIds(List<String> ids);
+
+    /**
+     * 根据id批量查找菜单
+     * @param collect
+     * @return
+     */
+    List<Menu> selectMenuByIds(List<String> collect);
 }

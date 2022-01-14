@@ -28,9 +28,8 @@ import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import javax.validation.constraints.NotEmpty;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -150,11 +149,31 @@ public class MenuBizImpl implements MenuBiz {
 
     @Override
     public Map<String, Object> findMenuById(@NotBlank(message = "id不能为空") String id) {
-        Menu menu=menuService.findMenuById(id);
-        if(menu==null){
+        Menu menu = menuService.findMenuById(id);
+        if (menu == null) {
             throw new ZfException("该菜单不存在");
         }
         return CommonResponse.setResponseData(menu);
+    }
+
+    @Override
+    public Map<String, Object> deleteMenuByIds(@NotEmpty String[] ids) {
+        //判断该菜单下是否存在子菜单
+        List<String> list = Arrays.asList(ids);
+        List<String> collect = list.stream().filter(id -> {
+            List<Menu> subMenus = menuService.selectSubMenusById(id);
+            return !CollectionUtils.isEmpty(subMenus);
+        }).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(collect)) {
+            //查菜单名称
+            List<Menu> menus = menuService.selectMenuByIds(collect);
+            List<String> menuNames = menus.stream().map(menu -> menu.getmName()).collect(Collectors.toList());
+            throw new ZfException(menuNames + "存在子菜单，请先删除子菜单!");
+        }
+        //取差集
+        list.removeAll(collect);
+        menuService.deleteMenuByIds(list);
+        return CommonResponse.setResponseData(null);
     }
 
 
@@ -168,7 +187,7 @@ public class MenuBizImpl implements MenuBiz {
     public List<BindMenuVueTreeVo> getChildren(BindMenuVueTreeVo root, List<BindMenuVueTreeVo> all) {
         List<BindMenuVueTreeVo> children = all.stream()
                 // 根据 父菜单 ID 查找当前菜单 ID，以便于找到 当前菜单的子菜单
-                .filter(menu -> StringUtils.equals(menu.getPId(),root.getId()))
+                .filter(menu -> StringUtils.equals(menu.getPId(), root.getId()))
                 // 递归查找子菜单的子菜单
                 .map((menu) -> {
                     menu.setChildren(getChildren(menu, all));
@@ -178,7 +197,6 @@ public class MenuBizImpl implements MenuBiz {
                 .collect(Collectors.toList());
         return children;
     }
-
 
 
     private List<MenuVo> getSubMenus(List<Menu> menus) {

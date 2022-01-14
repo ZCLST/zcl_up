@@ -44,4 +44,22 @@ public class MenuServiceImpl implements MenuService {
         return  menuMapper.selectById(id);
     }
 
+    @Override
+    public List<Menu> selectSubMenusById(String id) {
+        QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Menu.P_MENU,id);
+        queryWrapper.orderByAsc(Menu.M_SORT);
+        return menuMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public void deleteMenuByIds(List<String> ids) {
+         menuMapper.deleteBatchIds(ids);
+    }
+
+    @Override
+    public List<Menu> selectMenuByIds(List<String> collect) {
+        return menuMapper.selectBatchIds(collect);
+    }
+
 }

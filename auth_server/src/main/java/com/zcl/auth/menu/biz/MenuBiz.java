@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Map;
 
@@ -56,4 +57,11 @@ public interface MenuBiz {
      * @return
      */
     Map<String, Object> findMenuById(@NotBlank(message = "id不能为空") String id);
+
+    /**
+     * 根据ID删除菜单
+     * @param ids
+     * @return
+     */
+    Map<String, Object> deleteMenuByIds(@NotEmpty String[] ids);
 }

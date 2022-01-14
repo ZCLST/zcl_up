@@ -62,4 +62,14 @@ public class MenuController {
     public Map<String, Object> findMenuById(String id) {
         return menuBiz.findMenuById(id);
     }
+
+    /**
+     * 根据ID删除菜单
+     * @param ids
+     * @return
+     */
+    @PostMapping(value = "/deleteMenuByIds.json")
+    public Map<String, Object> deleteMenuByIds(@RequestBody String[] ids) {
+        return menuBiz.deleteMenuByIds(ids);
+    }
 }

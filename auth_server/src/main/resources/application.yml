@@ -14,8 +14,11 @@ eureka:
   client:
     service-url:
       defaultZone: http://127.0.0.1:8071/eureka/
+  healthcheck.enable: true #开启健康检查
   instance:
     prefer-ip-address: true # 当调用gapplication.ymletHostname获取实例的hostname时，返回ip而不是host名称
+    lease-renewal-interval-in-seconds: 3
+    lease-expiration-duration-in-seconds: 6
 #持久层 mybatis-plus
 mybatis-plus:
   configuration:
