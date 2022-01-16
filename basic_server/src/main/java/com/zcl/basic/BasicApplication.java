@@ -1,5 +1,6 @@
 package com.zcl.basic;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -15,6 +16,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  **/
 @SpringBootApplication(scanBasePackages = "com.zcl")
 @EnableEurekaClient
+@MapperScan("com.zcl.basic.*.mapper*")
 public class BasicApplication {
     public static void main(String[] args) {
         SpringApplication.run(BasicApplication.class,args);
