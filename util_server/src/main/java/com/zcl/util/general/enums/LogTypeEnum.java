@@ -1,8 +1,14 @@
-package com.zcl.basic.enums;
+package com.zcl.util.general.enums;
 
 /**
- * 日志类型枚举类
- */
+
+ * @author  zcl
+
+ * @create  2022/1/16 21:48
+
+ * @desc    日志类型枚举类
+
+ **/
 public enum LogTypeEnum {
     LOGIN("1", "登录"),
     LOGOUT("2", "注销"),
@@ -29,8 +35,16 @@ public enum LogTypeEnum {
         return code;
     }
 
+    public void setCode(String code) {
+        this.code = code;
+    }
+
     public String getDesc() {
         return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     //根据code获取enum

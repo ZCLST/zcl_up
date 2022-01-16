@@ -1,14 +1,10 @@
 package com.zcl.basic.log.controller;
 
 import com.zcl.basic.log.biz.LogBiz;
-import com.zcl.basic.log.dto.ActionDto;
 import com.zcl.basic.log.request.FunctionLogRequest;
-import com.zcl.basic.log.vo.ActionVo;
-import com.zcl.util.general.response.CommonResponse;
-import com.zcl.util.general.util.BeanUtil;
+import com.zcl.util.general.annotation.PointLog;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +27,7 @@ public class LogController {
      * @param functionLogRequest
      * @return
      */
+    @PointLog(id = "7", value = "功能日志")
     @PostMapping("/selectPageFunctionLog.json")
     public Map<String, Object> selectPageFunctionLog(@RequestBody FunctionLogRequest functionLogRequest) {
         return logBiz.selectPageFunctionLog(functionLogRequest);
@@ -42,6 +39,7 @@ public class LogController {
      * @param functionLogRequest
      * @return
      */
+    @PointLog(id = "6", value = "登录日志")
     @PostMapping("/selectPageLoginLog.json")
     public Map<String, Object> selectPageLoginLog(@RequestBody FunctionLogRequest functionLogRequest) {
         return logBiz.selectPageLoginLog(functionLogRequest);

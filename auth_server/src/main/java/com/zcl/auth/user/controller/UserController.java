@@ -4,6 +4,7 @@ import com.zcl.auth.user.biz.UserBiz;
 import com.zcl.auth.user.request.LoginRequest;
 import com.zcl.auth.user.request.UserPageRequest;
 import com.zcl.auth.user.request.UserRequest;
+import com.zcl.util.general.annotation.PointLog;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public class UserController {
      * @param userPageRequest
      * @return
      */
+    @PointLog(id = "9", value = "用户管理")
     @PostMapping("/listUser.json")
     public Map<String, Object> listUser(@RequestBody UserPageRequest userPageRequest) {
         return userBiz.listUser(userPageRequest);

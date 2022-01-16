@@ -4,6 +4,8 @@ import com.zcl.auth.menu.biz.MenuBiz;
 import com.zcl.auth.menu.request.MenuRequest;
 import com.zcl.auth.menu.vo.BindMenuTreeVo;
 import com.zcl.auth.menu.vo.MenuVo;
+import com.zcl.util.general.annotation.PointLog;
+import com.zcl.util.general.enums.LogTypeEnum;
 import com.zcl.util.general.response.CommonResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +44,7 @@ public class MenuController {
      * 菜单管理获取所有菜单
      * @return
      */
+    @PointLog(id = "10", value = "菜单管理")
     @GetMapping(value = "/selectAllMenus.json")
     public Map<String, Object> selectAllMenus() {
         return menuBiz.selectAllMenus();

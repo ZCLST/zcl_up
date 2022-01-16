@@ -6,6 +6,7 @@ import com.zcl.auth.role.biz.RoleBiz;
 import com.zcl.auth.role.request.RoleAddRequest;
 import com.zcl.auth.role.request.RolePageRequest;
 import com.zcl.auth.role.request.RoleUpdateRequest;
+import com.zcl.util.general.annotation.PointLog;
 import com.zcl.util.general.response.CommonResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,7 @@ public class RoleController {
      * @param rolePageRequest
      * @return
      */
+    @PointLog(id = "8", value = "角色管理")
     @PostMapping("/selectPageRoles.json")
     public Map<String, Object> selectPageRoles(@RequestBody RolePageRequest rolePageRequest) {
         return roleBiz.selectPageRoles(rolePageRequest);

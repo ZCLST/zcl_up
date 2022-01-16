@@ -2,15 +2,13 @@ package com.zcl.basic.log.biz.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.zcl.basic.enums.LogTypeEnum;
 import com.zcl.basic.log.biz.LogBiz;
-import com.zcl.basic.log.dto.ActionDto;
 import com.zcl.basic.log.request.FunctionLogRequest;
 import com.zcl.basic.log.service.LogService;
 import com.zcl.basic.log.vo.ActionVo;
 import com.zcl.basic.log.vo.FunctionLogPageVo;
+import com.zcl.util.general.enums.LogTypeEnum;
 import com.zcl.util.general.response.CommonResponse;
-import com.zcl.util.general.util.BeanUtil;
 import com.zcl.util.general.util.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

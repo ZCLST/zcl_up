@@ -1,9 +1,7 @@
-package com.zcl.auth.aspect;
+package com.zcl.basic.aspect;
 
 
 import com.zcl.util.general.annotation.PointLog;
-import com.zcl.util.general.util.DateUtils;
-import com.zcl.util.general.util.SessionUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
