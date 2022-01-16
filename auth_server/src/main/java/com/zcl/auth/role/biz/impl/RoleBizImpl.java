@@ -9,6 +9,7 @@ import com.zcl.auth.role.request.RolePageRequest;
 import com.zcl.auth.role.request.RoleUpdateRequest;
 import com.zcl.auth.role.service.RoleService;
 import com.zcl.auth.role.vo.RoleDropDownVo;
+import com.zcl.util.general.enums.SysCodeEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.BeanUtil;
@@ -68,7 +69,7 @@ public class RoleBizImpl implements RoleBiz {
             }
         });
         Role role = BeanUtil.convert(roleAddRequest, Role.class);
-        String token = httpServletRequest.getHeader("Authorization");
+        String token = httpServletRequest.getHeader(SysCodeEnum.HEADER_NAME.getCode());
         String time = DateUtils.getNowTime();
         Jedis jedis = JedisUtil.getJedis();
         String uId = jedis.get(token);

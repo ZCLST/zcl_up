@@ -2,6 +2,7 @@ package com.zcl.gateway.fliter;
 
 import com.zcl.gateway.common.WhiteListInIt;
 
+import com.zcl.gateway.common.enums.SysCodeEnum;
 import com.zcl.gateway.util.JedisUtil;
 import com.zcl.gateway.util.JwtUtil;
 import org.apache.commons.lang.StringUtils;
@@ -44,7 +45,7 @@ public class LoginFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);//放行
         }
         //非白名单进行拦截，获取请求头中的token
-        String token = request.getHeaders().getFirst("Authorization");
+        String token = request.getHeaders().getFirst(SysCodeEnum.HEADER_NAME.getCode());
         if (StringUtils.isEmpty(token)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);//无权限状态码
             return exchange.getResponse().setComplete();//结束请求

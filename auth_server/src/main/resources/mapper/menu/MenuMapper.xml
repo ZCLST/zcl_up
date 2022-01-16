@@ -13,4 +13,14 @@
         order by m.m_sort, m.m_name desc
     </select>
 
+    <select id="findMenuAndParentMenuById" resultType="com.zcl.auth.menu.dto.MenuAndParentMenuDto">
+        select t1.m_name as p_menu_name, t2.*
+        from t_menu t1
+                 join (
+            select *
+            from t_menu
+            where m_id = #{id}
+        ) t2
+        on t1.m_id = t2.p_menu
+    </select>
 </mapper>

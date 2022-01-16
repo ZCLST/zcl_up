@@ -1,6 +1,7 @@
 package com.zcl.auth.menu.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zcl.auth.menu.dto.MenuAndParentMenuDto;
 import com.zcl.auth.menu.model.Menu;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +24,11 @@ public interface MenuMapper extends BaseMapper<Menu> {
      * @return
      */
     List<Menu> selectMenusByRid(String rId);
+
+    /**
+     * 根据ID获取菜单和父菜单
+     * @param id
+     * @return
+     */
+    MenuAndParentMenuDto findMenuAndParentMenuById(String id);
 }

@@ -64,6 +64,15 @@ public class MenuController {
     }
 
     /**
+     * 根据ID获取菜单和父菜单
+     * @return
+     */
+    @GetMapping(value = "/findMenuAndParentMenuById.json")
+    public Map<String, Object> findMenuAndParentMenuById(String id) {
+        return menuBiz.findMenuAndParentMenuById(id);
+    }
+
+    /**
      * 根据ID删除菜单
      * @param ids
      * @return
@@ -71,5 +80,15 @@ public class MenuController {
     @PostMapping(value = "/deleteMenuByIds.json")
     public Map<String, Object> deleteMenuByIds(@RequestBody String[] ids) {
         return menuBiz.deleteMenuByIds(ids);
+    }
+
+    /**
+     * 更新菜单
+     * @param menuRequest
+     * @return
+     */
+    @PostMapping(value = "/updateMenu.json")
+    public Map<String, Object> updateMenu(HttpServletRequest httpServletRequest,@RequestBody  MenuRequest menuRequest){
+        return menuBiz.updateMenu(httpServletRequest,menuRequest);
     }
 }

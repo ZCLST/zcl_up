@@ -1,32 +1,31 @@
-package com.zcl.auth.menu.request;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
+package com.zcl.auth.menu.vo;
 /**
 
- * @author  曾小白
+ * @author  zcl
 
- * @create  2022/1/12 15:38
+ * @create  2022/1/15 12:19
 
- * @desc    菜单请求类
+ * @desc    菜单和父菜单Vo
 
  **/
-public class MenuRequest {
+public class MenuAndParentMenuVo {
     private String mId;
 
     /**
      * 菜单功能名
      */
-    @NotBlank(message = "mName不能为空")
     private String mName;
 
 
     /**
      * 上级功能编号
      */
-    @NotBlank(message = "pMenu不能为空")
     private String pMenu;
+
+    /**
+     * 上级功能名
+     */
+    private String pMenuName;
 
     /**
      * 是否用于导航（0：是 1：否）
@@ -36,7 +35,6 @@ public class MenuRequest {
     /**
      * 菜单URL
      */
-    @NotBlank(message = "mUrl")
     private String mUrl;
 
     /**
@@ -47,7 +45,6 @@ public class MenuRequest {
     /**
      * 菜单顺序
      */
-    @NotNull(message = "mSort不能为空")
     private Integer mSort;
 
     /**
@@ -55,13 +52,14 @@ public class MenuRequest {
      */
     private String mDesc;
 
-    public MenuRequest() {
+    public MenuAndParentMenuVo() {
     }
 
-    public MenuRequest(String mId, String mName, String pMenu, String isNavigation, String mUrl, String mIcon, Integer mSort, String mDesc) {
+    public MenuAndParentMenuVo(String mId, String mName, String pMenu, String pMenuName, String isNavigation, String mUrl, String mIcon, Integer mSort, String mDesc) {
         this.mId = mId;
         this.mName = mName;
         this.pMenu = pMenu;
+        this.pMenuName = pMenuName;
         this.isNavigation = isNavigation;
         this.mUrl = mUrl;
         this.mIcon = mIcon;
@@ -91,6 +89,14 @@ public class MenuRequest {
 
     public void setpMenu(String pMenu) {
         this.pMenu = pMenu;
+    }
+
+    public String getpMenuName() {
+        return pMenuName;
+    }
+
+    public void setpMenuName(String pMenuName) {
+        this.pMenuName = pMenuName;
     }
 
     public String getIsNavigation() {

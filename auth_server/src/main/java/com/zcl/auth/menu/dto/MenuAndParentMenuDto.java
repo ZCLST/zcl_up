@@ -1,31 +1,29 @@
-package com.zcl.auth.menu.request;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
+package com.zcl.auth.menu.dto;
 /**
 
- * @author  曾小白
+ * @author  zcl
 
- * @create  2022/1/12 15:38
+ * @create  2022/1/15 12:16
 
- * @desc    菜单请求类
+ * @desc    菜单和父菜单DTO
 
  **/
-public class MenuRequest {
+public class MenuAndParentMenuDto {
+    /**
+     * 上级功能名
+     */
+    private String pMenuName;
     private String mId;
 
     /**
      * 菜单功能名
      */
-    @NotBlank(message = "mName不能为空")
     private String mName;
 
 
     /**
      * 上级功能编号
      */
-    @NotBlank(message = "pMenu不能为空")
     private String pMenu;
 
     /**
@@ -36,7 +34,6 @@ public class MenuRequest {
     /**
      * 菜单URL
      */
-    @NotBlank(message = "mUrl")
     private String mUrl;
 
     /**
@@ -47,7 +44,6 @@ public class MenuRequest {
     /**
      * 菜单顺序
      */
-    @NotNull(message = "mSort不能为空")
     private Integer mSort;
 
     /**
@@ -55,10 +51,31 @@ public class MenuRequest {
      */
     private String mDesc;
 
-    public MenuRequest() {
+    /**
+     * 创建人
+     */
+    private String createUser;
+
+    /**
+     * 创建时间
+     */
+    private String createTime;
+
+    /**
+     * 修改人
+     */
+    private String updateUser;
+
+    /**
+     * 修改时间
+     */
+    private String updateTime;
+
+    public MenuAndParentMenuDto() {
     }
 
-    public MenuRequest(String mId, String mName, String pMenu, String isNavigation, String mUrl, String mIcon, Integer mSort, String mDesc) {
+    public MenuAndParentMenuDto(String pMenuName, String mId, String mName, String pMenu, String isNavigation, String mUrl, String mIcon, Integer mSort, String mDesc, String createUser, String createTime, String updateUser, String updateTime) {
+        this.pMenuName = pMenuName;
         this.mId = mId;
         this.mName = mName;
         this.pMenu = pMenu;
@@ -67,6 +84,18 @@ public class MenuRequest {
         this.mIcon = mIcon;
         this.mSort = mSort;
         this.mDesc = mDesc;
+        this.createUser = createUser;
+        this.createTime = createTime;
+        this.updateUser = updateUser;
+        this.updateTime = updateTime;
+    }
+
+    public String getpMenuName() {
+        return pMenuName;
+    }
+
+    public void setpMenuName(String pMenuName) {
+        this.pMenuName = pMenuName;
     }
 
     public String getmId() {
@@ -131,5 +160,37 @@ public class MenuRequest {
 
     public void setmDesc(String mDesc) {
         this.mDesc = mDesc;
+    }
+
+    public String getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 }

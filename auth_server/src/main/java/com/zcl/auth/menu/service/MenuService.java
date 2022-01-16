@@ -1,6 +1,8 @@
 package com.zcl.auth.menu.service;
 
+import com.zcl.auth.menu.dto.MenuAndParentMenuDto;
 import com.zcl.auth.menu.model.Menu;
+import com.zcl.auth.menu.request.MenuRequest;
 
 import java.util.List;
 
@@ -59,4 +61,32 @@ public interface MenuService {
      * @return
      */
     List<Menu> selectMenuByIds(List<String> collect);
+
+    /**
+     * 更新用户
+     * @param menu
+     */
+    void updateMenu(Menu menu);
+
+    /**
+     * 根据ID获取菜单和父菜单
+     * @param id
+     * @return
+     */
+    MenuAndParentMenuDto findMenuAndParentMenuById(String id);
+
+    /**
+     * 根据菜单名称查找菜单
+     * @param mName
+     * @return
+     */
+    List<Menu> selectMenuByMenuName(String mName);
+
+    /**
+     * 根据Url查找菜单
+     * @param mUrl
+     * @return
+     */
+    List<Menu> selectMenuByMenuUrl(String mUrl);
+
 }

@@ -40,6 +40,10 @@ public class BindMenuVueTreeVo {
      */
     private String url;
     /**
+     * 排序
+     */
+    private Integer sort;
+    /**
      * 子菜单
      */
     private List<BindMenuVueTreeVo> children;

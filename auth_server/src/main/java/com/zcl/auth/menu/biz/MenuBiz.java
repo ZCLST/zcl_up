@@ -64,4 +64,18 @@ public interface MenuBiz {
      * @return
      */
     Map<String, Object> deleteMenuByIds(@NotEmpty String[] ids);
+
+    /**
+     * 更新菜单
+     * @param menuRequest
+     * @return
+     */
+    Map<String, Object> updateMenu(HttpServletRequest httpServletRequest,@Valid MenuRequest menuRequest);
+
+    /**
+     * 根据ID获取菜单和父菜单
+     * @param id
+     * @return
+     */
+    Map<String, Object> findMenuAndParentMenuById(@NotBlank(message = "ID不能为空") String id);
 }

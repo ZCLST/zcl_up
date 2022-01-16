@@ -3,15 +3,18 @@ package com.zcl.auth.menu.biz.impl;
 import com.alibaba.druid.sql.visitor.functions.Bin;
 import com.netflix.ribbon.proxy.annotation.Http;
 import com.zcl.auth.menu.biz.MenuBiz;
+import com.zcl.auth.menu.dto.MenuAndParentMenuDto;
 import com.zcl.auth.menu.model.Menu;
 import com.zcl.auth.menu.request.MenuRequest;
 import com.zcl.auth.menu.service.MenuService;
 import com.zcl.auth.menu.vo.BindMenuTreeVo;
 import com.zcl.auth.menu.vo.BindMenuVueTreeVo;
+import com.zcl.auth.menu.vo.MenuAndParentMenuVo;
 import com.zcl.auth.menu.vo.MenuVo;
 import com.zcl.auth.user.model.User;
 import com.zcl.auth.user.service.UserService;
 import com.zcl.util.general.enums.ErrorCodeEnum;
+import com.zcl.util.general.enums.SysCodeEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.BeanUtil;
@@ -23,6 +26,7 @@ import ma.glasnost.orika.MapperFactory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Jedis;
 
@@ -50,7 +54,7 @@ public class MenuBizImpl implements MenuBiz {
 
     @Override
     public Map<String, Object> getMenuByUser(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
+        String token = httpServletRequest.getHeader(SysCodeEnum.HEADER_NAME.getCode());
         if (StringUtils.isEmpty(token)) {
             throw new ZfException(ErrorCodeEnum.TIMEOUT.getDesc());
         }
@@ -118,6 +122,7 @@ public class MenuBizImpl implements MenuBiz {
                 bindMenuVueTreeVo.setIcon(menu.getmIcon());
                 bindMenuVueTreeVo.setDesc(menu.getmDesc());
                 bindMenuVueTreeVo.setUrl(menu.getmUrl());
+                bindMenuVueTreeVo.setSort(menu.getmSort());
                 bindMenuVueTreeVos.add(bindMenuVueTreeVo);
             });
             //生成菜单树
@@ -138,7 +143,17 @@ public class MenuBizImpl implements MenuBiz {
     @Override
     public Map<String, Object> addMenu(HttpServletRequest httpServletRequest, MenuRequest menuRequest) {
         Menu menu = BeanUtil.convert(menuRequest, Menu.class);
-        String token = httpServletRequest.getHeader("Authorization");
+        //判断名称是否存在
+        List<Menu> menuByMenuName = menuService.selectMenuByMenuName(menu.getmName());
+        if (!CollectionUtils.isEmpty(menuByMenuName)) {
+            throw new ZfException("该名称已存在");
+        }
+        //判断URL是都存在
+        List<Menu> menuByMenuUrl = menuService.selectMenuByMenuUrl(menu.getmUrl());
+        if (!CollectionUtils.isEmpty(menuByMenuUrl)) {
+            throw new ZfException("该URL已存在");
+        }
+        String token = httpServletRequest.getHeader(SysCodeEnum.HEADER_NAME.getCode());
         Jedis jedis = JedisUtil.getJedis();
         String uId = jedis.get(token);
         menu.setCreateTime(DateUtils.getNowTime());
@@ -174,6 +189,64 @@ public class MenuBizImpl implements MenuBiz {
         list.removeAll(collect);
         menuService.deleteMenuByIds(list);
         return CommonResponse.setResponseData(null);
+    }
+
+    @Override
+    public Map<String, Object> updateMenu(HttpServletRequest httpServletRequest, MenuRequest menuRequest) {
+        String mId = menuRequest.getmId();
+        Assert.hasLength(mId, "id不能为空");
+        Menu menu = menuService.findMenuById(mId);
+        Assert.notNull(menu, "找不到该菜单");
+        //名称不可重复
+        checkDuplicateName(menu.getmName(), menuRequest.getmName());
+        //url不可重复
+        checkDuplicateUrl(menu.getmUrl(), menuRequest.getmUrl());
+        //获取当前操作用户
+        String token = httpServletRequest.getHeader(SysCodeEnum.HEADER_NAME.getCode());
+        Assert.hasLength(token, "token已过期");
+        Jedis jedis = JedisUtil.getJedis();
+        String uId = jedis.get(token);
+        menu.setmDesc(menuRequest.getmDesc());
+        menu.setmIcon(menuRequest.getmIcon());
+        menu.setIsNavigation(menuRequest.getIsNavigation());
+        menu.setmName(menuRequest.getmName());
+        menu.setmSort(menuRequest.getmSort());
+        menu.setmUrl(menuRequest.getmUrl());
+        menu.setUpdateTime(DateUtils.getNowTime());
+        menu.setUpdateUser(uId);
+        //更新
+        menuService.updateMenu(menu);
+        return CommonResponse.setResponseData(null);
+    }
+
+    private void checkDuplicateUrl(String oldMenuUrl, String newMenuUrl) {
+        if (StringUtils.equals(newMenuUrl, oldMenuUrl)) {
+            return;
+        }
+        List<Menu> menuList = menuService.selectMenuByMenuUrl(newMenuUrl);
+        if (!CollectionUtils.isEmpty(menuList)) {
+            throw new ZfException("菜单Url已存在！");
+        }
+    }
+
+    private void checkDuplicateName(String oldMenuName, String newMenuName) {
+        if (StringUtils.equals(oldMenuName, newMenuName)) {
+            return;
+        }
+        List<Menu> menuList = menuService.selectMenuByMenuName(newMenuName);
+        if (!CollectionUtils.isEmpty(menuList)) {
+            throw new ZfException("菜单名称已存在！");
+        }
+    }
+
+    @Override
+    public Map<String, Object> findMenuAndParentMenuById(String id) {
+        MenuAndParentMenuDto menuAndParentMenuDto = menuService.findMenuAndParentMenuById(id);
+        if (menuAndParentMenuDto == null) {
+            throw new ZfException("该菜单不存在");
+        }
+        MenuAndParentMenuVo menuAndParentMenuVo = BeanUtil.convert(menuAndParentMenuDto, MenuAndParentMenuVo.class);
+        return CommonResponse.setResponseData(menuAndParentMenuVo);
     }
 
 
