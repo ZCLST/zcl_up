@@ -44,7 +44,7 @@
                     and action =#{functionLogRequest.action}
                 </when>
                 <otherwise>
-                    and action in("登录","注销")
+                    and action not in("登录","注销")
                 </otherwise>
             </choose>
             <if test="functionLogRequest.beginDate!=null and functionLogRequest.beginDate!=''">
