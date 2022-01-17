@@ -45,14 +45,14 @@ feign:
       productserver: #指明查看服务日志名称
         loggerLevel: FULL
   #开启hystrix
-  hystrix:
-    enabled: true
-    command:
-      default:
-        execution:
-          isolation:
-            thread:
-              timeoutInMilliseconds: 3000 #默认连接超时时间为1秒
+#  hystrix:
+#    enabled: true
+#    command:
+#      default:
+#        execution:
+#          isolation:
+#            thread:
+#              timeoutInMilliseconds: 3000 #默认连接超时时间为1秒
 logging:
   level:
     com.zcl.anth.user.feign.MenuFeignClient: debug
