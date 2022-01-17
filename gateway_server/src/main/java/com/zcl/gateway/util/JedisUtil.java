@@ -17,6 +17,14 @@ public class JedisUtil {
     private static int port;
     private static int maxToal;
     private static int maxIdel;
+    /**
+     * 密码
+     */
+    private static String passWord;
+    /**
+     * 超时时间
+     */
+    private static Integer timeOut;
 
     //初始化
     static {
@@ -25,10 +33,12 @@ public class JedisUtil {
         port = Integer.parseInt(redis.getString("spring.redis.port"));
         maxToal = Integer.parseInt(redis.getString("spring.redis.maxToal"));
         maxIdel = Integer.parseInt(redis.getString("spring.redis.maxIdel"));
+        passWord = redis.getString("spring.redis.password");
+        timeOut= Integer.valueOf(redis.getString("spring.redis.timeout"));
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPoolConfig.setMaxIdle(maxIdel);
         jedisPoolConfig.setMaxTotal(maxToal);
-        jedisPool = new JedisPool(jedisPoolConfig, host, port);
+        jedisPool = new JedisPool(jedisPoolConfig, host, port,timeOut,passWord);
     }
 
     public static Jedis getJedis() {
