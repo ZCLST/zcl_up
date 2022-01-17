@@ -35,6 +35,7 @@ public class UserController {
      * @param loginRequest
      * @return
      */
+    @PointLog(id = "1", value = "登录")
     @RequestMapping(value = "/checkUser.form", method = RequestMethod.POST)
     public Map<String, Object> checkUser(@RequestBody LoginRequest loginRequest) {
         return userBiz.checkUserLogin(loginRequest);

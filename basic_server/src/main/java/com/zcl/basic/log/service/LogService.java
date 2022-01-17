@@ -2,6 +2,7 @@ package com.zcl.basic.log.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zcl.basic.log.dto.ActionDto;
+import com.zcl.basic.log.model.Log;
 import com.zcl.basic.log.request.FunctionLogRequest;
 import com.zcl.basic.log.vo.FunctionLogPageVo;
 
@@ -32,4 +33,10 @@ public interface LogService {
      * @return
      */
     IPage<FunctionLogPageVo> selectPageLoginLog(IPage<FunctionLogPageVo> logPage, FunctionLogRequest functionLogRequest);
+
+    /**
+     * 保存日志
+     * @param log
+     */
+    void saveLog(Log log);
 }

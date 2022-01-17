@@ -1,9 +1,13 @@
 package com.zcl.auth.aspect;
 
 
+import com.zcl.auth.feign.log.client.LogFeignClient;
+import com.zcl.auth.feign.log.dto.LogDto;
 import com.zcl.util.general.annotation.PointLog;
+import com.zcl.util.general.enums.LogTypeEnum;
+import com.zcl.util.general.enums.SysCodeEnum;
 import com.zcl.util.general.util.DateUtils;
-import com.zcl.util.general.util.SessionUtil;
+import com.zcl.util.general.util.JedisUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,8 +15,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import redis.clients.jedis.Jedis;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 
 /**
@@ -23,9 +30,10 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public class FunctionAspect {
-    private HttpSession httpSession;
     @Autowired
-//    private LogService logService;
+    private HttpServletRequest httpServletRequest;
+    @Autowired
+    private LogFeignClient logFeignClient;
 
     //切点为loginChek()方法
     @Pointcut("@annotation(com.zcl.util.general.annotation.PointLog)")
@@ -38,8 +46,6 @@ public class FunctionAspect {
         System.out.println("环绕通知：---------------------");
         //获得方法执行后的返回值
         Object proceed = pjp.proceed();//让目标方法执行
-
-        //保存到功能日志表中
         //获得请求的方法
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         Method method = signature.getMethod();
@@ -49,17 +55,20 @@ public class FunctionAspect {
             // 注解上的描述
             String value = logAnnotation.value();
             String id = logAnnotation.id();
-//            //获取当前时间
-//            String date = DateUtils.getNowTime();
-//            //获取当前用户名
-//            String userName = (String) SessionUtil.getSessionAttribute("userName");
-//            String SysFunName = LogStatus.getNameByCode(id);
-//            Log log = new Log();
-//            log.setCreateTime(date);
-//            log.setUserName(userName);
-//            log.setAction(SysFunName);
-//            logService.addLog(log);
-            System.out.println(value);
+            //获取当前时间
+            String date = DateUtils.getNowTime();
+            //获取当前用户ID
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+            String token = request.getHeader(SysCodeEnum.HEADER_NAME.getCode());
+            Jedis jedis = JedisUtil.getJedis();
+            String uId = jedis.get(token);
+            String functionName = LogTypeEnum.getDescByCode(id).getDesc();
+            LogDto logDto = new LogDto();
+            logDto.setAction(functionName);
+            logDto.setCreateUser(uId);
+            logDto.setCreateTime(date);
+            logFeignClient.saveLog(logDto);
         }
         return proceed;
     }

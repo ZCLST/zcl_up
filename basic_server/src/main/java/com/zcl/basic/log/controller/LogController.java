@@ -1,10 +1,12 @@
 package com.zcl.basic.log.controller;
 
 import com.zcl.basic.log.biz.LogBiz;
+import com.zcl.basic.log.dto.LogDto;
 import com.zcl.basic.log.request.FunctionLogRequest;
 import com.zcl.util.general.annotation.PointLog;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 /**
@@ -54,5 +56,15 @@ public class LogController {
     @GetMapping("/initSelect.json")
     public Map<String, Object> initSelect() {
         return logBiz.getSelectOption();
+    }
+
+    /**
+     * 保存日志
+     * @param logDto
+     * @return
+     */
+    @PostMapping("/saveLog.json")
+    public Map<String, Object> saveLog(@RequestBody LogDto logDto){
+        return logBiz.saveLog(logDto);
     }
 }

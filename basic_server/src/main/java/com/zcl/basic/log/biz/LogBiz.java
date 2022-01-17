@@ -1,6 +1,7 @@
 package com.zcl.basic.log.biz;
 
 import com.zcl.basic.log.dto.ActionDto;
+import com.zcl.basic.log.dto.LogDto;
 import com.zcl.basic.log.request.FunctionLogRequest;
 
 import java.util.List;
@@ -35,4 +36,11 @@ public interface LogBiz {
      * @return
      */
     Map<String, Object> selectPageLoginLog(FunctionLogRequest functionLogRequest);
+
+    /**
+     * 保存日志
+     * @param logDto
+     * @return
+     */
+    Map<String, Object> saveLog(LogDto logDto);
 }

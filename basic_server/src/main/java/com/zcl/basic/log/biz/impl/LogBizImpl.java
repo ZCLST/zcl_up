@@ -3,12 +3,15 @@ package com.zcl.basic.log.biz.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zcl.basic.log.biz.LogBiz;
+import com.zcl.basic.log.dto.LogDto;
+import com.zcl.basic.log.model.Log;
 import com.zcl.basic.log.request.FunctionLogRequest;
 import com.zcl.basic.log.service.LogService;
 import com.zcl.basic.log.vo.ActionVo;
 import com.zcl.basic.log.vo.FunctionLogPageVo;
 import com.zcl.util.general.enums.LogTypeEnum;
 import com.zcl.util.general.response.CommonResponse;
+import com.zcl.util.general.util.BeanUtil;
 import com.zcl.util.general.util.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -45,13 +48,10 @@ public class LogBizImpl implements LogBiz {
         List<ActionVo> list = new ArrayList<>();
         for (LogTypeEnum m :
                 LogTypeEnum.values()) {
-            if (!m.getCode().equals("1") && !m.getCode().equals("2")) {
                 ActionVo actionVo = new ActionVo();
                 actionVo.setKey(m.getCode());
                 actionVo.setAction(m.getDesc());
                 list.add(actionVo);
-            }
-
         }
         return CommonResponse.setResponseData(list);
     }
@@ -62,6 +62,13 @@ public class LogBizImpl implements LogBiz {
         IPage<FunctionLogPageVo> logPage = this.handleRequest(functionLogRequest);
         IPage<FunctionLogPageVo> result = logService.selectPageLoginLog(logPage, functionLogRequest);
         return CommonResponse.setResponseData(result);
+    }
+
+    @Override
+    public Map<String, Object> saveLog(LogDto logDto) {
+        Log log = BeanUtil.convert(logDto, Log.class);
+        logService.saveLog(log);
+        return CommonResponse.setResponseData(null);
     }
 
 
