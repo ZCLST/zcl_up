@@ -35,10 +35,19 @@ public class UserController {
      * @param loginRequest
      * @return
      */
-    @PointLog(id = "1", value = "登录")
-    @RequestMapping(value = "/checkUser.form", method = RequestMethod.POST)
+    @PostMapping( "/checkUser.form")
     public Map<String, Object> checkUser(@RequestBody LoginRequest loginRequest) {
         return userBiz.checkUserLogin(loginRequest);
+    }
+
+    /**
+     * 用户登出
+     * @return
+     */
+    @PointLog(id = "2", value = "注销")
+    @GetMapping("/logOut.json")
+    public Map<String,Object> logOut(){
+        return userBiz.logOut();
     }
 
     /**

@@ -57,4 +57,10 @@ public interface UserBiz {
      * @return
      */
     Map<String, Object> findUserByUid(String uId);
+
+    /**
+     * 用户登出
+     * @return
+     */
+    Map<String, Object> logOut();
 }

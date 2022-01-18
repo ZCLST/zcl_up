@@ -57,7 +57,6 @@ public class FunctionAspect {
 //            log.setUserName(userName);
 //            log.setAction(SysFunName);
 //            logService.addLog(log);
-            System.out.println(value);
         }
         return proceed;
     }

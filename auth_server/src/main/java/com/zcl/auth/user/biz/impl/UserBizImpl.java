@@ -11,6 +11,7 @@ import com.zcl.auth.user.request.UserRequest;
 import com.zcl.auth.user.service.UserService;
 import com.zcl.auth.user.vo.UserTokenVo;
 import com.zcl.util.general.enums.StatusEnum;
+import com.zcl.util.general.enums.SysCodeEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.*;
@@ -18,8 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import redis.clients.jedis.Jedis;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -121,10 +125,21 @@ public class UserBizImpl implements UserBiz {
 
     @Override
     public Map<String, Object> findUserByUid(String uId) {
-        if(StringUtils.isBlank(uId)){
+        if (StringUtils.isBlank(uId)) {
             throw new ZfException("uId不能为空");
         }
-        User user=userService.findUserByUid(uId);
+        User user = userService.findUserByUid(uId);
         return CommonResponse.setResponseData(user);
+    }
+
+    @Override
+    public Map<String, Object> logOut() {
+        //清除redis缓存
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String token = request.getHeader(SysCodeEnum.HEADER_NAME.getCode());
+        Jedis jedis = JedisUtil.getJedis();
+        String uId = jedis.get(token);
+        jedis.del(token, uId);
+        return CommonResponse.setResponseData(null);
     }
 }
