@@ -44,7 +44,6 @@ public class UserController {
      * 用户登出
      * @return
      */
-    @PointLog(id = "2", value = "注销")
     @GetMapping("/logOut.json")
     public Map<String,Object> logOut(){
         return userBiz.logOut();
