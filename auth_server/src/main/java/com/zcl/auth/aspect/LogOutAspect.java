@@ -23,25 +23,21 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @author 曾小白
  * @create 2022/1/18 12:44
- * @desc 登录日志切面类
+ * @desc 登出切面类
  **/
 @Aspect
 @Component
-public class LogInAspect {
+public class LogOutAspect {
     @Autowired
     private LogFeignClient logFeignClient;
     @Autowired
@@ -50,7 +46,7 @@ public class LogInAspect {
     private String userId;
 
     //切点为loginChek()方法
-    @Pointcut("execution(* com.zcl.auth.user.controller.UserController.checkUser(..))")
+    @Pointcut("execution(* com.zcl.auth.user.controller.UserController.logOut(..))")
     private void pointCut() {
     }
 
@@ -58,20 +54,12 @@ public class LogInAspect {
     @Before("pointCut()")
     public void before(JoinPoint joinPoint) {
         System.out.println("-----------前置通知--------");
-        Object[] args = joinPoint.getArgs();
-        LoginRequest user = (LoginRequest) args[0];
-        userName = user.getuName();
-        String password = user.getPassword();
-        String md5Pw = null;
-        try {
-            md5Pw = MD5Util.EncoderByMd5(password);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ZfException("用户名或密码不正确");
-        }
-        User userByNameAndPassWord = userService.findUserByNameAndPassWord(userName, md5Pw);
-        Assert.notNull(userByNameAndPassWord, "该用户不存在");
-        userId = userByNameAndPassWord.getuId();
+        //获取当前用户ID
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+        String token = request.getHeader(SysCodeEnum.HEADER_NAME.getCode());
+        Jedis jedis = JedisUtil.getJedis();
+        userId = jedis.get(token);
         System.out.println("-----------前置通知完--------");
     }
 
@@ -83,7 +71,7 @@ public class LogInAspect {
         //获取当前时间
         String date = DateUtils.getNowTime();
         LogDto logDto = new LogDto();
-        logDto.setAction(LogTypeEnum.LOGIN.getDesc());
+        logDto.setAction(LogTypeEnum.LOGOUT.getDesc());
         logDto.setCreateUser(userId);
         logDto.setCreateTime(date);
         logFeignClient.saveLog(logDto);
