@@ -33,7 +33,7 @@ public class NoticeBizImpl implements NoticeBiz {
         String userId = ContextUtils.getUserId();
         Assert.hasLength(userId, "该用户不存在");
         noticePageRequest.setUserId(userId);
-        IPage<Notice> noticePage = new Page<>(noticePageRequest.getPageSize(), noticePageRequest.getPageIndex());
+        IPage<NoticePageVo> noticePage = new Page<>(noticePageRequest.getPageSize(), noticePageRequest.getPageIndex());
         IPage<NoticePageVo> noticeIPage = noticeService.selectPageNotice(noticePage, noticePageRequest);
         return CommonResponse.setResponseData(noticeIPage);
     }

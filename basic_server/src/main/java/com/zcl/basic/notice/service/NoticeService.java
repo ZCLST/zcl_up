@@ -21,5 +21,5 @@ public interface NoticeService {
      * @param noticePageRequest
      * @return
      */
-    IPage<NoticePageVo> selectPageNotice(IPage<Notice> noticePage, NoticePageRequest noticePageRequest);
+    IPage<NoticePageVo> selectPageNotice(IPage<NoticePageVo> noticePage, NoticePageRequest noticePageRequest);
 }

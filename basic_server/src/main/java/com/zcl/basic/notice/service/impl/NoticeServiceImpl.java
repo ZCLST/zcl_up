@@ -26,7 +26,7 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public IPage<NoticePageVo> selectPageNotice(IPage<Notice> noticePage, NoticePageRequest noticePageRequest) {
+    public IPage<NoticePageVo> selectPageNotice(IPage<NoticePageVo> noticePage, NoticePageRequest noticePageRequest) {
         return noticeMapper.selectPageNotice(noticePage,noticePageRequest);
     }
 }

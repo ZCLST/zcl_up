@@ -20,7 +20,7 @@ public class NoticePageVo {
     /**
      * 信件主题
      */
-    private String eTopic;
+        private String eTopic;
     /**
      * 发送时间
      */

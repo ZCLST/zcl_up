@@ -25,7 +25,7 @@ public interface NoticeMapper extends BaseMapper<Notice> {
      * @param noticePageRequest
      * @return
      */
-    IPage<NoticePageVo> selectPageNotice(@Param("noticePage") IPage<Notice> noticePage, @Param("noticePageRequest") NoticePageRequest noticePageRequest);
+    IPage<NoticePageVo> selectPageNotice(@Param("noticePage") IPage<NoticePageVo> noticePage, @Param("noticePageRequest") NoticePageRequest noticePageRequest);
 }
 
 
