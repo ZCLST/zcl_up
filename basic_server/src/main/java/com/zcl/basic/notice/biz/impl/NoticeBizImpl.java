@@ -9,8 +9,11 @@ import com.zcl.basic.notice.service.NoticeService;
 import com.zcl.basic.notice.vo.NoticePageVo;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.ContextUtils;
+import com.zcl.util.general.util.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
 import java.util.Map;
 
 /**
@@ -33,7 +36,12 @@ public class NoticeBizImpl implements NoticeBiz {
         String userId = ContextUtils.getUserId();
         Assert.hasLength(userId, "该用户不存在");
         noticePageRequest.setUserId(userId);
-        IPage<NoticePageVo> noticePage = new Page<>(noticePageRequest.getPageSize(), noticePageRequest.getPageIndex());
+        //设置开始时间、结束时间
+        if (!CollectionUtils.isEmpty(noticePageRequest.getCreateTime())) {
+            noticePageRequest.setBeginDate(DateUtils.getTime(noticePageRequest.getCreateTime().get(0)));
+            noticePageRequest.setEndDate(DateUtils.getTime(noticePageRequest.getCreateTime().get(1)));
+        }
+        IPage<NoticePageVo> noticePage = new Page<>(noticePageRequest.getPageIndex(),noticePageRequest.getPageSize());
         IPage<NoticePageVo> noticeIPage = noticeService.selectPageNotice(noticePage, noticePageRequest);
         return CommonResponse.setResponseData(noticeIPage);
     }

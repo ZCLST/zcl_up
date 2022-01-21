@@ -1,16 +1,13 @@
 package com.zcl.basic.notice.vo;
+
 /**
-
- * @author  zcl
-
- * @create  2022/1/19 22:00
-
- * @desc    站内信分页VO
-
+ * @author zcl
+ * @create 2022/1/19 22:00
+ * @desc 站内信分页VO
  **/
 public class NoticePageVo {
     /**
-     *发件人
+     * 发件人
      */
     private String uName;
     /**
@@ -20,7 +17,7 @@ public class NoticePageVo {
     /**
      * 信件主题
      */
-        private String eTopic;
+    private String eTopic;
     /**
      * 发送时间
      */

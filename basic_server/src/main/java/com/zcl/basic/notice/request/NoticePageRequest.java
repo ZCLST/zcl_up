@@ -1,7 +1,7 @@
 package com.zcl.basic.notice.request;
 
 import lombok.Data;
-
+import java.util.List;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -22,7 +22,15 @@ public class NoticePageRequest {
     /**
      * 收件时间
      */
-    private String createTime;
+    private List<String> createTime;
+    /**
+     * 开始时间
+     */
+    private String beginDate;
+    /**
+     * 结束时间
+     */
+    private String endDate;
     /**
      * 是否已读
      */
