@@ -70,8 +70,9 @@ public class LogInAspect {
             throw new ZfException("用户名或密码不正确");
         }
         User userByNameAndPassWord = userService.findUserByNameAndPassWord(userName, md5Pw);
-        Assert.notNull(userByNameAndPassWord, "该用户不存在");
-        userId = userByNameAndPassWord.getuId();
+        if (userByNameAndPassWord != null) {
+            userId = userByNameAndPassWord.getuId();
+        }
         System.out.println("-----------前置通知完--------");
     }
 
