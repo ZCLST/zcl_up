@@ -14,7 +14,6 @@
         <module>mq_server</module>
         <module>order_server</module>
         <module>basic_server</module>
-        <module>util_server</module>
     </modules>
 
     <!--全局版本管理-->
