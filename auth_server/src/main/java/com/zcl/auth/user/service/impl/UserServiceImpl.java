@@ -61,4 +61,6 @@ public class UserServiceImpl implements UserService {
     public void deleteBatchUser(List<String> uid_list) {
         userMapper.deleteBatchIds(uid_list);
     }
+
+
 }

@@ -12,13 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
-
- * @author  zcl
-
- * @create  2021/12/18 16:06
-
- * @desc    用户控制层
-
+ * @author zcl
+ * @create 2021/12/18 16:06
+ * @desc 用户控制层
  **/
 @RestController
 @RequestMapping("/userController")
@@ -35,17 +31,18 @@ public class UserController {
      * @param loginRequest
      * @return
      */
-    @PostMapping( "/checkUser.form")
+    @PostMapping("/checkUser.form")
     public Map<String, Object> checkUser(@RequestBody LoginRequest loginRequest) {
         return userBiz.checkUserLogin(loginRequest);
     }
 
     /**
      * 用户登出
+     *
      * @return
      */
     @GetMapping("/logOut.json")
-    public Map<String,Object> logOut(){
+    public Map<String, Object> logOut() {
         return userBiz.logOut();
     }
 
@@ -63,32 +60,45 @@ public class UserController {
 
     /**
      * 添加或修改用户
+     *
      * @param userRequest
      * @return
      */
     @PostMapping("/addOrUpdateUser.json")
-    public Map<String,Object> addOrUpdateUser(@RequestBody UserRequest userRequest){
+    public Map<String, Object> addOrUpdateUser(@RequestBody UserRequest userRequest) {
         return userBiz.addOrUpdateUser(userRequest);
     }
 
     /**
      * 根据uId批量删除用户
+     *
      * @param uIds
      * @return
      */
     @PostMapping("/deleteBatchUser.json")
-    public Map<String,Object> deleteBatchUser(@RequestBody String[] uIds){
+    public Map<String, Object> deleteBatchUser(@RequestBody String[] uIds) {
         List<String> uid_list = Arrays.asList(uIds);
         return userBiz.deleteBatchUser(uid_list);
     }
+
     /**
      * 根据uId查询用户
+     *
      * @param uId
      * @return
      */
     @PostMapping("/findUserByUid.json")
-    public Map<String,Object> findUserByUid(@RequestBody String uId){
+    public Map<String, Object> findUserByUid(@RequestBody String uId) {
         return userBiz.findUserByUid(uId);
+    }
+
+    /**
+     * 查询所有用户
+     * @return
+     */
+    @GetMapping("/selectAllUser.json")
+    public Map<String, Object> selectAllUser() {
+        return userBiz.selectAllUser();
     }
 
 }

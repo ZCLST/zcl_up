@@ -62,4 +62,5 @@ public interface UserService {
      * @param uid_list
      */
     void deleteBatchUser(List<String> uid_list);
+
 }

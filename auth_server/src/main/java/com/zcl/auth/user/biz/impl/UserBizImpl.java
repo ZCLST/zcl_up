@@ -142,4 +142,10 @@ public class UserBizImpl implements UserBiz {
         jedis.del(token, uId);
         return CommonResponse.setResponseData(null);
     }
+
+    @Override
+    public Map<String, Object> selectAllUser() {
+        List<User> list=userService.listUsers();
+        return CommonResponse.setResponseData(list);
+    }
 }

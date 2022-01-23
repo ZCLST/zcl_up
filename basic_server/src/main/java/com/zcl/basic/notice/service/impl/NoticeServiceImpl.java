@@ -9,13 +9,9 @@ import com.zcl.basic.notice.vo.NoticePageVo;
 import org.springframework.stereotype.Service;
 
 /**
-
- * @author  zcl
-
- * @create  2022/1/19 21:30
-
- * @desc    站内信通用业务实现层
-
+ * @author zcl
+ * @create 2022/1/19 21:30
+ * @desc 站内信通用业务实现层
  **/
 @Service
 public class NoticeServiceImpl implements NoticeService {
@@ -29,5 +25,10 @@ public class NoticeServiceImpl implements NoticeService {
     public IPage<NoticePageVo> selectPageNotice(IPage<NoticePageVo> noticePage, NoticePageRequest noticePageRequest) {
         IPage<NoticePageVo> noticePageVoIPage = noticeMapper.selectPageNotice(noticePage, noticePageRequest);
         return noticePageVoIPage;
+    }
+
+    @Override
+    public void saveNotice(Notice notice) {
+        noticeMapper.insert(notice);
     }
 }

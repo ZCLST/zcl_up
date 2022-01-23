@@ -22,4 +22,10 @@ public interface NoticeService {
      * @return
      */
     IPage<NoticePageVo> selectPageNotice(IPage<NoticePageVo> noticePage, NoticePageRequest noticePageRequest);
+
+    /**
+     * 保存站内信
+     * @param notice
+     */
+    void saveNotice(Notice notice);
 }

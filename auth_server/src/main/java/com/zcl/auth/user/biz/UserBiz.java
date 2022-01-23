@@ -63,4 +63,10 @@ public interface UserBiz {
      * @return
      */
     Map<String, Object> logOut();
+
+    /**
+     * 查询所有用户
+     * @return
+     */
+    Map<String, Object> selectAllUser();
 }

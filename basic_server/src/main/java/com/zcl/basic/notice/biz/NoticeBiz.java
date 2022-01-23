@@ -1,9 +1,12 @@
 package com.zcl.basic.notice.biz;
 
 import com.zcl.basic.notice.request.NoticePageRequest;
+import com.zcl.basic.notice.request.SendEmailRequest;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -23,4 +26,18 @@ public interface NoticeBiz {
      * @return
      */
     Map<String, Object> selectPageNotice(@Valid NoticePageRequest noticePageRequest);
+
+    /**
+     * 发送信件
+     * @param sendEmailRequest
+     * @return
+     */
+    Map<String, Object> sendEmail(@Valid SendEmailRequest sendEmailRequest);
+
+    /**
+     * 上传文件至OSS
+     * @param file
+     * @return
+     */
+    Map<String, Object> uploadFile(@NotNull(message = "上传文件不能为空") MultipartFile file);
 }
