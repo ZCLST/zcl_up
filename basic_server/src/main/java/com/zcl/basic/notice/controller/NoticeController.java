@@ -77,11 +77,11 @@ public class NoticeController {
 
     /**
      * 删除消息
-     * @param nId
+     * @param nIds
      * @return
      */
     @PostMapping("/deleteNoticeByNoticeIds.json")
-    public Map<String,Object> deleteNoticeByNoticeIds(@RequestBody String[] nId){
-        return noticeBiz.deleteNoticeByNoticeIds(nId);
+    public Map<String,Object> deleteNoticeByNoticeIds(@RequestBody String[] nIds){
+        return noticeBiz.deleteNoticeByNoticeIds(nIds);
     }
 }

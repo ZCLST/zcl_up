@@ -1,5 +1,7 @@
 package com.zcl.basic.email.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
@@ -22,6 +24,7 @@ public class Email implements Serializable {
     /**
      * 主键
      */
+    @TableId(type = IdType.UUID)
     private String eId;
     /**
      * 标题

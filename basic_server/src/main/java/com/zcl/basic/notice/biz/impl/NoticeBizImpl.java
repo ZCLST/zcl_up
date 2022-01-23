@@ -112,12 +112,14 @@ public class NoticeBizImpl implements NoticeBiz {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> deleteNoticeByNoticeIds(String[] nId) {
         List<String> ids = Arrays.asList(nId);
+        List<Notice> noticeList = noticeService.selectNotices(ids);
         //删除消息
         noticeService.deleteNoticeByNoticeIds(ids);
         //删除信件
-        this.deleteEmail(ids);
+        this.deleteEmail(noticeList,ids);
         return CommonResponse.setResponseData(null);
     }
 
@@ -142,9 +144,8 @@ public class NoticeBizImpl implements NoticeBiz {
         return CommonResponse.setResponseData(checkEmailVo);
     }
 
-    private void deleteEmail(List<String> ids) {
+    private void deleteEmail(List<Notice> noticeList,List<String> ids) {
         //查出消息下所有信件
-        List<Notice> noticeList = noticeService.selectNotices(ids);
         List<String> emailIds = noticeList.stream().map(notice -> notice.geteId()).collect(Collectors.toList());
         //删除信件
         emailService.deleteByEmailIds(emailIds);
