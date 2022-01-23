@@ -7,6 +7,10 @@ package com.zcl.basic.notice.vo;
  **/
 public class NoticePageVo {
     /**
+     * 消息ID
+     */
+    private String nId;
+    /**
      * 发件人
      */
     private String uName;
@@ -30,12 +34,21 @@ public class NoticePageVo {
     public NoticePageVo() {
     }
 
-    public NoticePageVo(String uName, String eId, String eTopic, String createTime, String haveRead) {
+    public NoticePageVo(String nId, String uName, String eId, String eTopic, String createTime, String haveRead) {
+        this.nId = nId;
         this.uName = uName;
         this.eId = eId;
         this.eTopic = eTopic;
         this.createTime = createTime;
         this.haveRead = haveRead;
+    }
+
+    public String getnId() {
+        return nId;
+    }
+
+    public void setnId(String nId) {
+        this.nId = nId;
     }
 
     public String getuName() {

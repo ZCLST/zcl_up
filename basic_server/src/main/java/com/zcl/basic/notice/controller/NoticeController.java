@@ -1,12 +1,11 @@
 package com.zcl.basic.notice.controller;
 
+import com.sun.org.apache.regexp.internal.RE;
 import com.zcl.basic.notice.biz.NoticeBiz;
+import com.zcl.basic.notice.request.CheckTheNoticeRequest;
 import com.zcl.basic.notice.request.NoticePageRequest;
 import com.zcl.basic.notice.request.SendEmailRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
@@ -48,11 +47,41 @@ public class NoticeController {
         return noticeBiz.sendEmail(sendEmailRequest);
     }
 
+    /**
+     * 上传附件至OSS
+     * @param file
+     * @return
+     */
     @PostMapping("/uploadFile.json")
     public Map<String, Object> uploadFile(@RequestBody MultipartFile file) {
         return noticeBiz.uploadFile(file);
     }
-    //todo 全部已读
-    //todo 查看信件
-    //todo 删除
+
+    /**
+     * 查看消息
+     * @param checkTheNoticeRequest
+     * @return
+     */
+    @PostMapping("/checkTheNotice.json")
+    public Map<String,Object> checkTheNotice(@RequestBody CheckTheNoticeRequest checkTheNoticeRequest){
+        return noticeBiz.checkTheNotice(checkTheNoticeRequest);
+    }
+    /**
+     * 全部已读
+     * @return
+     */
+    @PostMapping("/setAllHaveBeenRead.json")
+    public Map<String,Object> setAllHaveBeenRead(){
+        return noticeBiz.setAllHaveBeenRead();
+    }
+
+    /**
+     * 删除消息
+     * @param nId
+     * @return
+     */
+    @PostMapping("/deleteNoticeByNoticeIds.json")
+    public Map<String,Object> deleteNoticeByNoticeIds(@RequestBody String[] nId){
+        return noticeBiz.deleteNoticeByNoticeIds(nId);
+    }
 }

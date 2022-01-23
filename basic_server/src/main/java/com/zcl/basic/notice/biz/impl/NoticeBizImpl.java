@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zcl.basic.email.model.Email;
 import com.zcl.basic.email.service.EmailService;
+import com.zcl.basic.email.vo.CheckEmailVo;
 import com.zcl.basic.feign.user.client.UserFeignClient;
 import com.zcl.basic.feign.user.dto.UserDto;
 import com.zcl.basic.notice.biz.NoticeBiz;
 import com.zcl.basic.notice.model.Notice;
+import com.zcl.basic.notice.request.CheckTheNoticeRequest;
 import com.zcl.basic.notice.request.NoticePageRequest;
 import com.zcl.basic.notice.request.SendEmailRequest;
 import com.zcl.basic.notice.service.NoticeService;
@@ -22,15 +24,19 @@ import com.zcl.util.general.util.BeanUtil;
 import com.zcl.util.general.util.ContextUtils;
 import com.zcl.util.general.util.DateUtils;
 import com.zcl.util.general.util.OssUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotEmpty;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 曾小白
@@ -61,7 +67,7 @@ public class NoticeBizImpl implements NoticeBiz {
             noticePageRequest.setBeginDate(DateUtils.getTime(noticePageRequest.getCreateTime().get(0)));
             noticePageRequest.setEndDate(DateUtils.getTime(noticePageRequest.getCreateTime().get(1)));
         }
-        IPage<NoticePageVo> noticePage = new Page<>(noticePageRequest.getPageIndex(),noticePageRequest.getPageSize());
+        IPage<NoticePageVo> noticePage = new Page<>(noticePageRequest.getPageIndex(), noticePageRequest.getPageSize());
         IPage<NoticePageVo> noticeIPage = noticeService.selectPageNotice(noticePage, noticePageRequest);
         return CommonResponse.setResponseData(noticeIPage);
     }
@@ -71,9 +77,9 @@ public class NoticeBizImpl implements NoticeBiz {
     public Map<String, Object> sendEmail(SendEmailRequest sendEmailRequest) {
         String eId = UUID.randomUUID().toString();
         //保存消息
-        this.saveNotice(eId,sendEmailRequest);
+        this.saveNotice(eId, sendEmailRequest);
         //保存信件
-        this.saveEmail(eId,sendEmailRequest);
+        this.saveEmail(eId, sendEmailRequest);
 
         return CommonResponse.setResponseData(null);
     }
@@ -88,7 +94,7 @@ public class NoticeBizImpl implements NoticeBiz {
             //生成OSS上传全路径
             filePath = OssUtil.getFilePath(originalFilename);
             InputStream inputStream = file.getInputStream();
-            OssUtil.upload(filePath,inputStream);
+            OssUtil.upload(filePath, inputStream);
             fileVo.setName(originalFilename);
             fileVo.setUrl(filePath);
         } catch (IOException e) {
@@ -98,6 +104,53 @@ public class NoticeBizImpl implements NoticeBiz {
         return CommonResponse.setResponseData(fileVo);
     }
 
+    @Override
+    public Map<String, Object> setAllHaveBeenRead() {
+        String userId = ContextUtils.getUserId();
+        noticeService.setAllHaveBeenReadByUserId(userId);
+        return CommonResponse.setResponseData(null);
+    }
+
+    @Override
+    public Map<String, Object> deleteNoticeByNoticeIds(String[] nId) {
+        List<String> ids = Arrays.asList(nId);
+        //删除消息
+        noticeService.deleteNoticeByNoticeIds(ids);
+        //删除信件
+        this.deleteEmail(ids);
+        return CommonResponse.setResponseData(null);
+    }
+
+    @Override
+    public Map<String, Object> checkTheNotice(CheckTheNoticeRequest checkTheNoticeRequest) {
+        String nId = checkTheNoticeRequest.getnId();
+        String eId = checkTheNoticeRequest.geteId();
+        Email email = emailService.selectEmailByEmailId(eId);
+        Assert.notNull(email,"不存在该信件");
+        String fileJson = email.getFileJson();
+        CheckEmailVo checkEmailVo = new CheckEmailVo();
+        checkEmailVo.setEmailTopic(email.geteTopic());
+        checkEmailVo.setEmailContent(email.geteContent());
+        if(StringUtils.isNotBlank(fileJson)){
+            List<FileVo> fileVos = JSON.parseArray(fileJson, FileVo.class);
+            checkEmailVo.setFileVos(fileVos);
+        }
+        //更新为已读
+        Notice notice=noticeService.findNoticeById(nId);
+        notice.setHaveRead("1");
+        noticeService.updateNotice(notice);
+        return CommonResponse.setResponseData(checkEmailVo);
+    }
+
+    private void deleteEmail(List<String> ids) {
+        //查出消息下所有信件
+        List<Notice> noticeList = noticeService.selectNotices(ids);
+        List<String> emailIds = noticeList.stream().map(notice -> notice.geteId()).collect(Collectors.toList());
+        //删除信件
+        emailService.deleteByEmailIds(emailIds);
+    }
+
+
     private void saveEmail(String eId, SendEmailRequest sendEmailRequest) {
         Email email = new Email();
         String nowTime = DateUtils.getNowTime();
@@ -106,14 +159,14 @@ public class NoticeBizImpl implements NoticeBiz {
         email.setCreateUser(sendEmailRequest.getUserId());
         email.seteContent(sendEmailRequest.getEmailContent());
         email.seteTopic(sendEmailRequest.getEmailTopic());
-        if(!CollectionUtils.isEmpty(sendEmailRequest.getFileVoList())){
+        if (!CollectionUtils.isEmpty(sendEmailRequest.getFileVoList())) {
             String json = JSONObject.toJSONString(sendEmailRequest.getFileVoList());
             email.setFileJson(json);//设置附件名称、地址
         }
         emailService.saveEmail(email);
     }
 
-    private void saveNotice(String eId,SendEmailRequest sendEmailRequest) {
+    private void saveNotice(String eId, SendEmailRequest sendEmailRequest) {
         Notice notice = new Notice();
         String nowTime = DateUtils.getNowTime();
         String userId = ContextUtils.getUserId();
@@ -121,8 +174,8 @@ public class NoticeBizImpl implements NoticeBiz {
         String receiveMan = sendEmailRequest.getReceiveMan();
         sendEmailRequest.setUserId(userId);
         //判断收件人是否存在
-        Object o=userFeignClient.findUserByUid(receiveMan);
-        Assert.notNull(o,"收件人【"+receiveMan+"】不存在");
+        Object o = userFeignClient.findUserByUid(receiveMan);
+        Assert.notNull(o, "收件人【" + receiveMan + "】不存在");
         notice.setCreateTime(nowTime);
         notice.seteId(eId);
         notice.setSendMan(userId);

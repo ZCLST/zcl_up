@@ -5,6 +5,8 @@ import com.zcl.basic.notice.model.Notice;
 import com.zcl.basic.notice.request.NoticePageRequest;
 import com.zcl.basic.notice.vo.NoticePageVo;
 
+import java.util.List;
+
 /**
 
  * @author  zcl
@@ -28,4 +30,35 @@ public interface NoticeService {
      * @param notice
      */
     void saveNotice(Notice notice);
+
+    /**
+     * 根据用户ID设置全部信件为已读
+     * @param userId
+     */
+    void setAllHaveBeenReadByUserId(String userId);
+
+    /**
+     * 根据nid删除消息
+     * @param nIds
+     */
+    void deleteNoticeByNoticeIds(List<String> nIds);
+
+    /**
+     * 根据nid查找消息
+     * @param ids
+     */
+    List<Notice> selectNotices(List<String> ids);
+
+
+    /**
+     * 根据ID查询单个notice
+     * @param nId
+     */
+    Notice findNoticeById(String nId);
+
+    /**
+     * 更新notice
+     * @param notice
+     */
+    void updateNotice(Notice notice);
 }

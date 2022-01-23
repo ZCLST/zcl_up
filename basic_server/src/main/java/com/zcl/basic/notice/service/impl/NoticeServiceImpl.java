@@ -8,6 +8,9 @@ import com.zcl.basic.notice.service.NoticeService;
 import com.zcl.basic.notice.vo.NoticePageVo;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author zcl
  * @create 2022/1/19 21:30
@@ -30,5 +33,30 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void saveNotice(Notice notice) {
         noticeMapper.insert(notice);
+    }
+
+    @Override
+    public void setAllHaveBeenReadByUserId(String userId) {
+        noticeMapper.setAllHaveBeenReadByUserId(userId);
+    }
+
+    @Override
+    public void deleteNoticeByNoticeIds(List<String> nIds) {
+        noticeMapper.deleteBatchIds(nIds);
+    }
+
+    @Override
+    public List<Notice> selectNotices(List<String> ids) {
+        return noticeMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public Notice findNoticeById(String nId) {
+        return noticeMapper.selectById(nId);
+    }
+
+    @Override
+    public void updateNotice(Notice notice) {
+        noticeMapper.updateById(notice);
     }
 }

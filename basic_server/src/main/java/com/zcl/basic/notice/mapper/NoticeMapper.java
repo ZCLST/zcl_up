@@ -26,6 +26,12 @@ public interface NoticeMapper extends BaseMapper<Notice> {
      * @return
      */
     IPage<NoticePageVo> selectPageNotice(@Param("noticePage") IPage<NoticePageVo> noticePage, @Param("noticePageRequest") NoticePageRequest noticePageRequest);
+
+    /**
+     * 根据用户ID消息全部已读
+     * @param userId
+     */
+    void setAllHaveBeenReadByUserId(String userId);
 }
 
 

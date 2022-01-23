@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zcl.basic.notice.mapper.NoticeMapper">
     <select id="selectPageNotice" resultType="com.zcl.basic.notice.vo.NoticePageVo">
-        select t3.u_name,t1.e_id,t1.e_topic, t1.create_time,t2.have_read
+        select t2.n_id,t3.u_name,t1.e_id,t1.e_topic, t1.create_time,t2.have_read
         from t_email t1
         join t_notice t2
         on t1.e_id = t2.e_id
@@ -25,4 +25,9 @@
         </where>
         order by t1.create_time desc,t3.u_name
     </select>
+    <update id="setAllHaveBeenReadByUserId">
+        update t_notice
+        set is_readed='1'
+        where recive_man = #{userId}
+    </update>
 </mapper>
