@@ -28,7 +28,7 @@ import java.util.UUID;
  **/
 @Slf4j
 public abstract class OssUtil {
-
+    public static final String HEADER="http://zcl-test123.oss-cn-beijing.aliyuncs.com/";
 
     private volatile static OSS ossClient;
     // Endpoint以杭州为例，其它Region请按实际情况填写。
@@ -78,6 +78,7 @@ public abstract class OssUtil {
      * @return
      */
     public static void upload(String objectName, InputStream inputStream) throws OSSException {
+
         if (StringUtils.isBlank(objectName)) {
             log.error("上传文件名或内容不能为null!");
             throw new ZfException("上传文件名或内容不能为null!");

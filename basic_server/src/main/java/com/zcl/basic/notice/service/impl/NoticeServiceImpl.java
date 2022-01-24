@@ -1,5 +1,6 @@
 package com.zcl.basic.notice.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zcl.basic.notice.mapper.NoticeMapper;
 import com.zcl.basic.notice.model.Notice;
@@ -58,5 +59,13 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void updateNotice(Notice notice) {
         noticeMapper.updateById(notice);
+    }
+
+    @Override
+    public Integer getNotReadNoticeNum(String userId) {
+        QueryWrapper<Notice> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Notice.RECEIVE_MAN,userId);
+        queryWrapper.eq(Notice.HAVE_READ,"0");
+        return noticeMapper.selectCount(queryWrapper);
     }
 }

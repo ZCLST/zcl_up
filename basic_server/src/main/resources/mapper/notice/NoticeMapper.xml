@@ -27,7 +27,7 @@
     </select>
     <update id="setAllHaveBeenReadByUserId">
         update t_notice
-        set is_readed='1'
-        where recive_man = #{userId}
+        set have_read='1'
+        where receive_man = #{userId}
     </update>
 </mapper>

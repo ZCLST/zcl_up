@@ -61,4 +61,11 @@ public interface NoticeService {
      * @param notice
      */
     void updateNotice(Notice notice);
+
+    /**
+     * 获取未读消息数量
+     * @param userId
+     * @return
+     */
+    Integer getNotReadNoticeNum(String userId);
 }

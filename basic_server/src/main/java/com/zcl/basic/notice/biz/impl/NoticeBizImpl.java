@@ -96,7 +96,7 @@ public class NoticeBizImpl implements NoticeBiz {
             InputStream inputStream = file.getInputStream();
             OssUtil.upload(filePath, inputStream);
             fileVo.setName(originalFilename);
-            fileVo.setUrl(filePath);
+            fileVo.setUrl(OssUtil.HEADER + filePath);
         } catch (IOException e) {
             e.printStackTrace();
             throw new ZfException("文件流转换失败");
@@ -119,7 +119,7 @@ public class NoticeBizImpl implements NoticeBiz {
         //删除消息
         noticeService.deleteNoticeByNoticeIds(ids);
         //删除信件
-        this.deleteEmail(noticeList,ids);
+        this.deleteEmail(noticeList, ids);
         return CommonResponse.setResponseData(null);
     }
 
@@ -128,23 +128,30 @@ public class NoticeBizImpl implements NoticeBiz {
         String nId = checkTheNoticeRequest.getnId();
         String eId = checkTheNoticeRequest.geteId();
         Email email = emailService.selectEmailByEmailId(eId);
-        Assert.notNull(email,"不存在该信件");
+        Assert.notNull(email, "不存在该信件");
         String fileJson = email.getFileJson();
         CheckEmailVo checkEmailVo = new CheckEmailVo();
         checkEmailVo.setEmailTopic(email.geteTopic());
         checkEmailVo.setEmailContent(email.geteContent());
-        if(StringUtils.isNotBlank(fileJson)){
+        if (StringUtils.isNotBlank(fileJson)) {
             List<FileVo> fileVos = JSON.parseArray(fileJson, FileVo.class);
             checkEmailVo.setFileVos(fileVos);
         }
         //更新为已读
-        Notice notice=noticeService.findNoticeById(nId);
+        Notice notice = noticeService.findNoticeById(nId);
         notice.setHaveRead("1");
         noticeService.updateNotice(notice);
         return CommonResponse.setResponseData(checkEmailVo);
     }
 
-    private void deleteEmail(List<Notice> noticeList,List<String> ids) {
+    @Override
+    public Map<String, Object> getNotReadNoticeNum() {
+        String userId = ContextUtils.getUserId();
+        Integer num = noticeService.getNotReadNoticeNum(userId);
+        return CommonResponse.setResponseData(num);
+    }
+
+    private void deleteEmail(List<Notice> noticeList, List<String> ids) {
         //查出消息下所有信件
         List<String> emailIds = noticeList.stream().map(notice -> notice.geteId()).collect(Collectors.toList());
         //删除信件

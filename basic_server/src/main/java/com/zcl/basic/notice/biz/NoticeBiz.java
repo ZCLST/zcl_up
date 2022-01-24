@@ -63,4 +63,10 @@ public interface NoticeBiz {
      * @return
      */
     Map<String, Object> checkTheNotice(@Valid CheckTheNoticeRequest checkTheNoticeRequest);
+
+    /**
+     * 获取未读消息
+     * @return
+     */
+    Map<String, Object> getNotReadNoticeNum();
 }

@@ -19,12 +19,12 @@ import java.io.Serializable;
 public class Notice implements Serializable {
     private static final long serialVersionUID = 3287659263037483763L;
 
-    private static final String N_ID="n_id";
-    private static final String SEND_MAN="send_man";
-    private static final String RECEIVE_MAN="receive_man";
-    private static final String E_ID="e_id";
-    private static final String HAVE_READ="have_read";
-    private static final String CREATE_TIME="create_time";
+    public static final String N_ID="n_id";
+    public static final String SEND_MAN="send_man";
+    public static final String RECEIVE_MAN="receive_man";
+    public static final String E_ID="e_id";
+    public static final String HAVE_READ="have_read";
+    public static final String CREATE_TIME="create_time";
 
     @TableId(type = IdType.UUID)
     private String nId;

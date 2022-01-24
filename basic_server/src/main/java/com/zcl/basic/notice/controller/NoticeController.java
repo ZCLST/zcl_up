@@ -84,4 +84,13 @@ public class NoticeController {
     public Map<String,Object> deleteNoticeByNoticeIds(@RequestBody String[] nIds){
         return noticeBiz.deleteNoticeByNoticeIds(nIds);
     }
+
+    /**
+     * 获取未读消息
+     * @return
+     */
+    @GetMapping("/getNotReadNotice.json")
+    public Map<String,Object> getNotReadNotice(){
+        return noticeBiz.getNotReadNoticeNum();
+    }
 }
