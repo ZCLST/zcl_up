@@ -76,8 +76,8 @@ public class LogBizImpl implements LogBiz {
         IPage<FunctionLogPageVo> logPage = new Page<>(functionLogRequest.getPageIndex(), functionLogRequest.getPageSize());
         //设置开始时间、结束时间
         if (!CollectionUtils.isEmpty(functionLogRequest.getDate())) {
-            functionLogRequest.setBeginDate(DateUtils.getTime(functionLogRequest.getDate().get(0)));
-            functionLogRequest.setEndDate(DateUtils.getTime(functionLogRequest.getDate().get(1)));
+            functionLogRequest.setBeginDate(functionLogRequest.getDate().get(0));
+            functionLogRequest.setEndDate(functionLogRequest.getDate().get(1));
         }
         //设置事件
         LogTypeEnum descByCode = LogTypeEnum.getDescByCode(functionLogRequest.getAction());

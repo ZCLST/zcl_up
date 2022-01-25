@@ -64,8 +64,8 @@ public class NoticeBizImpl implements NoticeBiz {
         noticePageRequest.setUserId(userId);
         //设置开始时间、结束时间
         if (!CollectionUtils.isEmpty(noticePageRequest.getCreateTime())) {
-            noticePageRequest.setBeginDate(DateUtils.getTime(noticePageRequest.getCreateTime().get(0)));
-            noticePageRequest.setEndDate(DateUtils.getTime(noticePageRequest.getCreateTime().get(1)));
+            noticePageRequest.setBeginDate(noticePageRequest.getCreateTime().get(0));
+            noticePageRequest.setEndDate(noticePageRequest.getCreateTime().get(1));
         }
         IPage<NoticePageVo> noticePage = new Page<>(noticePageRequest.getPageIndex(), noticePageRequest.getPageSize());
         IPage<NoticePageVo> noticeIPage = noticeService.selectPageNotice(noticePage, noticePageRequest);
