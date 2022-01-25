@@ -11,7 +11,6 @@
         <module>eureka_server</module>
         <module>gateway_server</module>
         <module>auth_server</module>
-        <module>mq_server</module>
         <module>order_server</module>
         <module>basic_server</module>
     </modules>

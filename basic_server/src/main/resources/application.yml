@@ -9,6 +9,21 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/zf?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&&failOverReadOnly=false
     username: root
     password: root
+  #配置rabbitMq 服务器
+  rabbitmq:
+    addresses: 127.0.0.1:5672
+    username: guest
+    password: guest
+    connection-timeout: 15000
+    #开启消费重试
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3 #最大重试次数
+        acknowledge-mode: manual  #手动签收模式开启
+    publisher-confirm-type: correlated  #确认消息已发送到交换机(Exchange)
+    publisher-returns: true #确认消息已发送到队列(Queue)
 #eureka配置
 eureka:
   client:
