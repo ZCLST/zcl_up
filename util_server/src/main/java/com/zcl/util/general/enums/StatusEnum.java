@@ -6,8 +6,10 @@ package com.zcl.util.general.enums;
  * @desc 请求状态枚举类
  **/
 public enum StatusEnum {
-    SUCCESS(true,"0", "成功"),
-    FAIL(false, "1","失败");
+    SUCCESS(true, "0", "成功"),
+    FAIL(false, "1", "失败"),
+    YES(true,"1","是"),
+    NO(true,"0","否");
     private Boolean code;
     private String flag;
     private String desc;
