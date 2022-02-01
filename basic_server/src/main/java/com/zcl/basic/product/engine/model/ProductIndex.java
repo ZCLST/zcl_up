@@ -1,9 +1,12 @@
 package com.zcl.basic.product.engine.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import java.util.Date;
 
 /**
 
@@ -14,7 +17,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
  * @desc    商品索引实体类
 
  **/
-@Document(indexName = "product",type = "product")
+@Document(indexName = "product")
 public class ProductIndex {
 
     public static final String PRODUCT_ID="productId";
@@ -22,10 +25,11 @@ public class ProductIndex {
     public static final String PRODUCT_NAME="productName";
     public static final String PRODUCT_MONEY="productMoney";
     public static final String STOCK="stock";
-    public static final String BATCH="batch";
+    public static final String WARE_HOUSE_CODE="warehouse_code";
     public static final String SPECK="speck";
     public static final String PRODUCT_URL="productUrl";
     public static final String STATUS="status";
+    public static final String CREATE_TIME="createTime";
     /**
      * 商品主键
      */
@@ -52,10 +56,10 @@ public class ProductIndex {
     @Field(type = FieldType.Long)
     private Long stock;
     /**
-     * 批号（区分库存）
+     * 库存号（区分库存）
      */
     @Field(type = FieldType.Keyword)
-    private String batch;
+    private String warehouseCode;
     /**
      * 单位
      */
@@ -71,20 +75,26 @@ public class ProductIndex {
      */
     @Field(type = FieldType.Text)
     private String status;
+    /**
+     * 创建时间
+     */
+    @Field(type = FieldType.Date,format = DateFormat.date_hour_minute_second)
+    private Date createTime;
 
     public ProductIndex() {
     }
 
-    public ProductIndex(String productId, String productCode, String productName, Long productMoney, Long stock, String batch, String speck, String productUrl, String status) {
+    public ProductIndex(String productId, String productCode, String productName, Long productMoney, Long stock, String warehouseCode, String speck, String productUrl, String status, Date createTime) {
         this.productId = productId;
         this.productCode = productCode;
         this.productName = productName;
         this.productMoney = productMoney;
         this.stock = stock;
-        this.batch = batch;
+        this.warehouseCode = warehouseCode;
         this.speck = speck;
         this.productUrl = productUrl;
         this.status = status;
+        this.createTime = createTime;
     }
 
     public String getProductId() {
@@ -127,12 +137,12 @@ public class ProductIndex {
         this.stock = stock;
     }
 
-    public String getBatch() {
-        return batch;
+    public String getWarehouseCode() {
+        return warehouseCode;
     }
 
-    public void setBatch(String batch) {
-        this.batch = batch;
+    public void setWarehouseCode(String warehouseCode) {
+        this.warehouseCode = warehouseCode;
     }
 
     public String getSpeck() {
@@ -157,5 +167,13 @@ public class ProductIndex {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

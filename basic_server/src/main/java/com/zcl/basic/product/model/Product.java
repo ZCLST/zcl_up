@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
 
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
  * @desc    商品实体类
 
  **/
-@TableName(value = "/t_product")
+@TableName(value = "t_product")
 public class Product implements Serializable {
     private static final long serialVersionUID = -425279956345107367L;
 
@@ -25,10 +26,11 @@ public class Product implements Serializable {
     public static final String PRODUCT_NAME="product_name";
     public static final String PRODUCT_MONEY="product_money";
     public static final String STOCK="stock";
-    public static final String BATCH="batch";
+    public static final String WARE_HOUSE_CODE="warehouse_code";
     public static final String SPECK="speck";
     public static final String PRODUCT_URL="product_url";
     public static final String STATUS="status";
+    public static final String CREATE_TIME="create_time";
     /**
      * 商品主键
      */
@@ -51,9 +53,9 @@ public class Product implements Serializable {
      */
     private BigDecimal stock;
     /**
-     * 批号（区分库存）
+     * 仓库号（区分库存）
      */
-    private String batch;
+    private String warehouseCode;
     /**
      * 单位
      */
@@ -66,20 +68,25 @@ public class Product implements Serializable {
      * 是否启用0禁用，1启用
      */
     private String status;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
     public Product() {
     }
 
-    public Product(String productId, String productCode, String productName, BigDecimal productMoney, BigDecimal stock, String batch, String speck, String productUrl, String status) {
+    public Product(String productId, String productCode, String productName, BigDecimal productMoney, BigDecimal stock, String warehouseCode, String speck, String productUrl, String status, Date createTime) {
         this.productId = productId;
         this.productCode = productCode;
         this.productName = productName;
         this.productMoney = productMoney;
         this.stock = stock;
-        this.batch = batch;
+        this.warehouseCode = warehouseCode;
         this.speck = speck;
         this.productUrl = productUrl;
         this.status = status;
+        this.createTime = createTime;
     }
 
     public String getProductId() {
@@ -122,12 +129,12 @@ public class Product implements Serializable {
         this.stock = stock;
     }
 
-    public String getBatch() {
-        return batch;
+    public String getWarehouseCode() {
+        return warehouseCode;
     }
 
-    public void setBatch(String batch) {
-        this.batch = batch;
+    public void setWarehouseCode(String warehouseCode) {
+        this.warehouseCode = warehouseCode;
     }
 
     public String getSpeck() {
@@ -152,5 +159,13 @@ public class Product implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 
 /**
@@ -22,13 +23,13 @@ public abstract class PageIndexRequest {
     /**
      * 分页大小
      */
-    @NotBlank(message = "pageSize不能为空")
-    private int pageSize;
+    @NotNull(message = "pageSize不能为空")
+    private Integer pageSize;
     /**
      * 页码
      */
-    @NotBlank(message = "pageNum不能为空")
-    private int pageNum;
+    @NotNull(message = "pageNum不能为空")
+    private Integer pageNum;
 
 
     public Pageable toPageable() {

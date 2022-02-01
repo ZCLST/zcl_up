@@ -18,7 +18,7 @@ import java.util.Map;
  **/
 @Component
 public class CommonResponse {
-    public static Map setPageResponse(Object data, Long recordsTotal, String responseCode, String responseMsg, boolean status) {
+    public static Map setPageResponse(Object data, Integer recordsTotal, String responseCode, String responseMsg, boolean status) {
         Map<String, Object> responseResult = new HashMap<>();
         responseResult.put("data", data);// 响应数据
         responseResult.put("count", recordsTotal);//条数
@@ -38,7 +38,7 @@ public class CommonResponse {
     }
 
 
-    public static Map setPageResponse(Object data, Long recordsTotal) {
+    public static Map setIndexPageResponse(Object data, Integer recordsTotal) {
         return setPageResponse(data, recordsTotal,
                 StatusEnum.SUCCESS.getFlag(), "查询成功", true );
     }

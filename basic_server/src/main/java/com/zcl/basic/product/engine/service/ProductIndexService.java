@@ -18,6 +18,16 @@ import java.util.List;
  **/
 public interface ProductIndexService {
 
+    /**
+     * 分页查询商品管理页面
+     * @param selectPageProductRequest
+     * @return
+     */
+    Page<ProductIndex> selectPageProduct(SelectPageProductRequest selectPageProductRequest);
 
-    List<Object> selectPageProduct(SelectPageProductRequest selectPageProductRequest);
+    /**
+     * 保存商品
+     * @param productIndex
+     */
+    void saveProductIndex(ProductIndex productIndex);
 }

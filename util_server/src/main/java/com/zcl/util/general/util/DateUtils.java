@@ -19,9 +19,9 @@ public abstract class DateUtils {
         return time;
     }
     //字符串日期转换成时间戳
-    public static Date dateReturnFomart(String date) {
+    public static Date dateReturnFormat(String date) {
         try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date time = format.parse(date);
             return time;
         } catch (ParseException e) {
