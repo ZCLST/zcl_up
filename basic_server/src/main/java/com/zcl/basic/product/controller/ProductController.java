@@ -2,11 +2,10 @@ package com.zcl.basic.product.controller;
 
 import com.zcl.basic.product.biz.ProductBiz;
 import com.zcl.basic.product.request.ProductSaveRequest;
+import com.zcl.basic.product.request.ProductUpdateRequest;
 import com.zcl.basic.product.request.SelectPageProductRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.zcl.basic.product.request.UpdateProductStatusRequest;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -45,5 +44,35 @@ public class ProductController {
     @PostMapping(value = "/insertProduct.json")
     public Map<String, Object> insertProduct(@RequestBody ProductSaveRequest productRequest) {
         return productBiz.insertProduct(productRequest);
+    }
+
+    /**
+     * 更新商品
+     * @param productUpdateRequest
+     * @return
+     */
+    @PostMapping(value = "/updateProduct.json")
+    public Map<String,Object> updateProduct(@RequestBody ProductUpdateRequest productUpdateRequest){
+        return productBiz.updateProduct(productUpdateRequest);
+    }
+
+    /**
+     * 批量更新商品上下架状态
+     * @param updateProductStatusRequest
+     * @return
+     */
+    @PostMapping(value = "/updateProductStatus.json")
+    public Map<String,Object> updateProductStatus(@RequestBody UpdateProductStatusRequest updateProductStatusRequest){
+        return productBiz.updateProductStatus(updateProductStatusRequest);
+    }
+
+    /**
+     * 根据ID查询商品
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/findProductById.json")
+    public Map<String,Object> findProductById(String id){
+        return productBiz.findProductById(id);
     }
 }

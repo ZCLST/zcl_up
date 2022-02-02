@@ -4,6 +4,8 @@ import com.zcl.basic.product.model.Product;
 import com.zcl.basic.product.request.ProductSaveRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
 
  * @author  zcl
@@ -25,4 +27,31 @@ public interface ProductService {
      * @param product
      */
     void saveProduct(Product product);
+
+    /**
+     * 判断商品是否存在
+     * @param productId
+     * @return
+     */
+    Product findProductById(String productId);
+
+    /**
+     * 更新商品
+     * @param product
+     */
+    void updateProduct(Product product);
+
+    /**
+     * 批量查询商品根据id
+     * @param ids
+     * @return
+     */
+    List<Product> selectProductByIds(List<String> ids);
+
+
+    /**
+     * 批量修改商品状态
+     * @param productIds
+     */
+    void batchUpdateProductStatus(List<String> productIds, String flagValue);
 }

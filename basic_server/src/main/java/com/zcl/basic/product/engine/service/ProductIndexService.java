@@ -3,8 +3,6 @@ package com.zcl.basic.product.engine.service;
 import com.zcl.basic.product.engine.model.ProductIndex;
 import com.zcl.basic.product.request.SelectPageProductRequest;
 import org.springframework.data.domain.Page;
-
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -26,8 +24,14 @@ public interface ProductIndexService {
     Page<ProductIndex> selectPageProduct(SelectPageProductRequest selectPageProductRequest);
 
     /**
-     * 保存商品
+     * 保存(更新)商品
      * @param productIndex
      */
     void saveProductIndex(ProductIndex productIndex);
+
+    /**
+     * 批量保存（更新）商品
+     * @param productIndexList
+     */
+    void batchSaveProductIndex(List<ProductIndex> productIndexList);
 }

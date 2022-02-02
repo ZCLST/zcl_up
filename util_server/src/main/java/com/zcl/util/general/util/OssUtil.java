@@ -28,6 +28,7 @@ import java.util.UUID;
  **/
 @Slf4j
 public abstract class OssUtil {
+    public static final String GLOBAL_IMG_URL="https://zcl-test123.oss-cn-beijing.aliyuncs.com/798fddc17f2211eb973d6100d940b6cf/20220131/%E5%A5%B6%E8%8C%B6.jpg";
     public static final String HEADER="http://zcl-test123.oss-cn-beijing.aliyuncs.com/";
 
     private volatile static OSS ossClient;

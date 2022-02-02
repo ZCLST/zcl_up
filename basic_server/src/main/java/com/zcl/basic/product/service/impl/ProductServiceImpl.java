@@ -7,6 +7,9 @@ import com.zcl.basic.product.request.ProductSaveRequest;
 import com.zcl.basic.product.service.ProductService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author zcl
  * @create 2022/1/28 15:43
@@ -32,4 +35,26 @@ public class ProductServiceImpl implements ProductService {
     public void saveProduct(Product product) {
         productMapper.insert(product);
     }
+
+    @Override
+    public Product findProductById(String productId) {
+        return productMapper.selectById(productId);
+    }
+
+    @Override
+    public void updateProduct(Product product) {
+        productMapper.updateById(product);
+    }
+
+    @Override
+    public List<Product> selectProductByIds(List<String> ids) {
+        return productMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public void batchUpdateProductStatus(List<String> productIds, String flagValue) {
+        productMapper.batchUpdateProductStatus(productIds,flagValue);
+    }
+
+
 }
