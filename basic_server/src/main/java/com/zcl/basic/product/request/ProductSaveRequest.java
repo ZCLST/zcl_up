@@ -37,16 +37,6 @@ public class ProductSaveRequest {
     @NotNull(message = "productMoney不能为空")
     private BigDecimal productMoney;
     /**
-     * 库存数
-     */
-    @NotNull(message = "stock不能为空")
-    private BigDecimal stock;
-    /**
-     * 仓库号（区分库存）
-     */
-    @NotBlank(message = "warehouseCode不能为空")
-    private String warehouseCode;
-    /**
      * 单位
      */
     private String speck;

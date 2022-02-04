@@ -27,7 +27,6 @@ public class ProductServiceImpl implements ProductService {
     public Product findProductByProductCodeAndBatch(ProductSaveRequest productRequest) {
         QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(Product.PRODUCT_CODE, productRequest.getProductCode());
-        queryWrapper.eq(Product.WARE_HOUSE_CODE, productRequest.getWarehouseCode());
         return productMapper.selectOne(queryWrapper);
     }
 
@@ -54,6 +53,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void batchUpdateProductStatus(List<String> productIds, String flagValue) {
         productMapper.batchUpdateProductStatus(productIds,flagValue);
+    }
+
+    @Override
+    public Product findProductByCode(String productCode) {
+        QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Product.PRODUCT_CODE,productCode);
+        return productMapper.selectOne(queryWrapper);
     }
 
 

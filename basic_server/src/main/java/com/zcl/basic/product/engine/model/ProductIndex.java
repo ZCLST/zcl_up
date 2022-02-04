@@ -51,15 +51,10 @@ public class ProductIndex {
     @Field(type = FieldType.Long)
     private Long productMoney;
     /**
-     * 库存数
+     * 库存总数
      */
     @Field(type = FieldType.Long)
     private Long stock;
-    /**
-     * 库存号（区分库存）
-     */
-    @Field(type = FieldType.Keyword)
-    private String warehouseCode;
     /**
      * 单位
      */
@@ -84,13 +79,12 @@ public class ProductIndex {
     public ProductIndex() {
     }
 
-    public ProductIndex(String productId, String productCode, String productName, Long productMoney, Long stock, String warehouseCode, String speck, String productUrl, String status, Date createTime) {
+    public ProductIndex(String productId, String productCode, String productName, Long productMoney, Long stock, String speck, String productUrl, String status, Date createTime) {
         this.productId = productId;
         this.productCode = productCode;
         this.productName = productName;
         this.productMoney = productMoney;
         this.stock = stock;
-        this.warehouseCode = warehouseCode;
         this.speck = speck;
         this.productUrl = productUrl;
         this.status = status;
@@ -135,14 +129,6 @@ public class ProductIndex {
 
     public void setStock(Long stock) {
         this.stock = stock;
-    }
-
-    public String getWarehouseCode() {
-        return warehouseCode;
-    }
-
-    public void setWarehouseCode(String warehouseCode) {
-        this.warehouseCode = warehouseCode;
     }
 
     public String getSpeck() {

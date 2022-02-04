@@ -1,6 +1,5 @@
 package com.zcl.basic.product.biz.impl;
 
-import com.ctc.wstx.util.BijectiveNsMap;
 import com.zcl.basic.product.biz.ProductBiz;
 import com.zcl.basic.product.engine.model.ProductIndex;
 import com.zcl.basic.product.engine.service.ProductIndexService;
@@ -12,7 +11,6 @@ import com.zcl.basic.product.request.UpdateProductStatusRequest;
 import com.zcl.basic.product.service.ProductService;
 import com.zcl.basic.product.vo.ProductVo;
 import com.zcl.util.general.enums.StatusEnum;
-import com.zcl.util.general.enums.SysCodeEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.BeanUtil;
@@ -20,12 +18,11 @@ import com.zcl.util.general.util.DateUtils;
 import com.zcl.util.general.util.MyBigDecimalUtil;
 import com.zcl.util.general.util.OssUtil;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.context.annotation.Bean;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -66,10 +63,10 @@ public class ProductBizImpl implements ProductBiz {
     @Override
     @Transactional
     public Map<String, Object> insertProduct(ProductSaveRequest productRequest) {
-        //判断商品编码、库存是否重复
-        Product productCodeAndBatch = productService.findProductByProductCodeAndBatch(productRequest);
-        if (productCodeAndBatch != null) {
-            throw new ZfException("该商品编码、批号已存在");
+        //判断商品编码是否重复
+        Product product = productService.findProductByCode(productRequest.getProductCode());
+        if (product != null) {
+            throw new ZfException("该商品编码已存在");
         }
         String uuid = UUID.randomUUID().toString();
         if(StringUtils.isEmpty(productRequest.getProductUrl())){
@@ -88,6 +85,13 @@ public class ProductBizImpl implements ProductBiz {
         //判断商品是否存在
         Product product = productService.findProductById(productUpdateRequest.getProductId());
         Assert.notNull(product, "该商品不存在");
+        //判断商品编码是否重复
+        if(!StringUtils.equals(product.getProductCode(),productUpdateRequest.getProductCode())){
+            Product productByCode = productService.findProductByCode(productUpdateRequest.getProductCode());
+            if (productByCode != null) {
+                throw new ZfException("该商品编码已存在");
+            }
+        }
         //更新数据库数据
         this.updateProductDb(product, productUpdateRequest);
         //更新ES
@@ -158,7 +162,7 @@ public class ProductBizImpl implements ProductBiz {
         productIndex.setCreateTime(product.getCreateTime());
         //设置金额、库存，放大1w倍
         Long money = MyBigDecimalUtil.multiply(productUpdateRequest.getProductMoney());
-        Long stock = MyBigDecimalUtil.multiply(productUpdateRequest.getStock());
+        Long stock = MyBigDecimalUtil.multiply(product.getStock());
         productIndex.setProductMoney(money);
         productIndex.setStock(stock);
         productIndexService.saveProductIndex(productIndex);
@@ -187,9 +191,9 @@ public class ProductBizImpl implements ProductBiz {
         productIndex.setProductId(uuid);
         //金额数量放大1W倍
         Long productMoney = MyBigDecimalUtil.multiply(productRequest.getProductMoney());
-        Long stock = MyBigDecimalUtil.multiply(productRequest.getStock());
         productIndex.setProductMoney(productMoney);
-        productIndex.setStock(stock);
+        //新增默认库存为0
+        productIndex.setStock(0L);
         productIndexService.saveProductIndex(productIndex);
     }
 

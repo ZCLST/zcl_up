@@ -54,4 +54,11 @@ public interface ProductService {
      * @param productIds
      */
     void batchUpdateProductStatus(List<String> productIds, String flagValue);
+
+    /**
+     * 根据商品编码查询商品
+     * @param productCode
+     * @return
+     */
+    Product findProductByCode(String productCode);
 }

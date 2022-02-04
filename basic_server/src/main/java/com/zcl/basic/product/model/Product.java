@@ -49,13 +49,9 @@ public class Product implements Serializable {
      */
     private BigDecimal productMoney;
     /**
-     * 库存数
+     * 库存总数
      */
     private BigDecimal stock;
-    /**
-     * 仓库号（区分库存）
-     */
-    private String warehouseCode;
     /**
      * 单位
      */
@@ -76,13 +72,12 @@ public class Product implements Serializable {
     public Product() {
     }
 
-    public Product(String productId, String productCode, String productName, BigDecimal productMoney, BigDecimal stock, String warehouseCode, String speck, String productUrl, String status, Date createTime) {
+    public Product(String productId, String productCode, String productName, BigDecimal productMoney, BigDecimal stock, String speck, String productUrl, String status, Date createTime) {
         this.productId = productId;
         this.productCode = productCode;
         this.productName = productName;
         this.productMoney = productMoney;
         this.stock = stock;
-        this.warehouseCode = warehouseCode;
         this.speck = speck;
         this.productUrl = productUrl;
         this.status = status;
@@ -127,14 +122,6 @@ public class Product implements Serializable {
 
     public void setStock(BigDecimal stock) {
         this.stock = stock;
-    }
-
-    public String getWarehouseCode() {
-        return warehouseCode;
-    }
-
-    public void setWarehouseCode(String warehouseCode) {
-        this.warehouseCode = warehouseCode;
     }
 
     public String getSpeck() {
