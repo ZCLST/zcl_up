@@ -88,13 +88,13 @@ public class ProductIndexServiceImpl implements ProductIndexService {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ProductIndex.PRODUCT_NAME, "*" + selectPageProductRequest.getProductName() + "*"));
         }
         //有无库存
-        if (StringUtils.isNotBlank(selectPageProductRequest.getHaveStock())) {
-            if (StringUtils.equals(StatusEnum.YES.getFlag(), selectPageProductRequest.getHaveStock())) {
-                boolQueryBuilder.must(QueryBuilders.rangeQuery(ProductIndex.STOCK).gt(0L));
-            } else {
-                boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STOCK, 0L));
-            }
-        }
+//        if (StringUtils.isNotBlank(selectPageProductRequest.getHaveStock())) {
+//            if (StringUtils.equals(StatusEnum.YES.getFlag(), selectPageProductRequest.getHaveStock())) {
+//                boolQueryBuilder.must(QueryBuilders.rangeQuery(ProductIndex.STOCK).gt(0L));
+//            } else {
+//                boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STOCK, 0L));
+//            }
+//        }
         //是否启用
         if (StringUtils.isNotBlank(selectPageProductRequest.getStatus())) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STATUS, selectPageProductRequest.getStatus()));

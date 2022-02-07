@@ -21,6 +21,7 @@ import com.zcl.util.general.util.MyBigDecimalUtil;
 import com.zcl.util.general.util.OssUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +54,7 @@ public class ProductBizImpl implements ProductBiz {
         List<ProductVo> productVos = BeanUtil.convertList(product.getContent(), ProductVo.class);
         if (CollectionUtils.isNotEmpty(productVos)) {
             //计算库存
-            this.handleStock(productVos);
+            this.handleStock(productVos, selectPageProductRequest.getHaveStock());
             //计算金额
             this.handleMoney(productVos);
             return CommonResponse.setIndexPageResponse(productVos, productVos.size());
@@ -69,12 +70,12 @@ public class ProductBizImpl implements ProductBiz {
         });
     }
 
-    private void handleStock(List<ProductVo> productVos) {
+    private void handleStock(List<ProductVo> productVos, String haveStock) {
         //查询商品库存，结果为空商品库存置为0
         Map<String, ProductStockDto> map = new HashMap<>();
         List<String> productIds = productVos.stream().map(productVo -> productVo.getProductId()).collect(Collectors.toList());
         List<ProductStockDto> productStockDtoList = warehouseService.selectStock(productIds);
-        if(CollectionUtils.isNotEmpty(productStockDtoList)){
+        if (CollectionUtils.isNotEmpty(productStockDtoList)) {
             productStockDtoList.stream().forEach(productStockDto -> {
                 map.put(productStockDto.getProductId(), productStockDto);
             });
@@ -82,10 +83,29 @@ public class ProductBizImpl implements ProductBiz {
         productVos.stream().forEach(productVo -> {
             if (map.containsKey(productVo.getProductId())) {
                 productVo.setRealStock(map.get(productVo.getProductId()).getStock());
-            }else{
+            } else {
                 productVo.setRealStock(new BigDecimal("0"));
             }
         });
+        //有无库存查询
+        if (StringUtils.isNotBlank(haveStock)) {
+            //有库存
+            if (StringUtils.equals(haveStock, StatusEnum.YES.getFlag())) {
+                BigDecimal bigDecimal = new BigDecimal("0.00");
+                List<ProductVo> collect = productVos.stream()
+                        .filter(productVo -> productVo.getRealStock().compareTo(bigDecimal)==1)
+                        .collect(Collectors.toList());
+                productVos.clear();
+                productVos.addAll(collect);
+            } else {
+                BigDecimal bigDecimal = new BigDecimal("0.00");
+                List<ProductVo> collect = productVos.stream()
+                        .filter(productVo -> productVo.getRealStock().compareTo(bigDecimal)<1)
+                        .collect(Collectors.toList());
+                productVos.clear();
+                productVos.addAll(collect);
+            }
+        }
     }
 
     @Override
@@ -165,7 +185,7 @@ public class ProductBizImpl implements ProductBiz {
         List<ProductVo> productVos = BeanUtil.convertList(product.getContent(), ProductVo.class);
         if (CollectionUtils.isNotEmpty(productVos)) {
             //计算库存
-            this.handleStock(productVos);
+            this.handleStock(productVos,selectPageProductRequest.getHaveStock());
             //计算金额
             this.handleMoney(productVos);
             return CommonResponse.setIndexPageResponse(productVos, productVos.size());
