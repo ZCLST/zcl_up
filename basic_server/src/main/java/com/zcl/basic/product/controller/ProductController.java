@@ -36,6 +36,16 @@ public class ProductController {
     }
 
     /**
+     * 分页查询商城商品
+     * @param selectPageProductRequest
+     * @return
+     */
+    @PostMapping(value = "/selectPageProductShop.json")
+    public Map<String,Object> selectPageProductShop(@RequestBody SelectPageProductRequest selectPageProductRequest){
+        return productBiz.selectPageProductShop(selectPageProductRequest);
+    }
+
+    /**
      * 新增商品
      *
      * @param productRequest

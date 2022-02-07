@@ -49,7 +49,7 @@ public interface ProductBiz {
      * @param updateProductStatusRequest
      * @return
      */
-    Map<String, Object> updateProductStatus(UpdateProductStatusRequest updateProductStatusRequest);
+    Map<String, Object> updateProductStatus(@Valid UpdateProductStatusRequest updateProductStatusRequest);
 
     /**
      * 根据ID查询商品
@@ -57,4 +57,11 @@ public interface ProductBiz {
      * @return
      */
     Map<String, Object> findProductById(@NotBlank(message = "id不能为空") String id);
+
+    /**
+     * 分页查询商城商品
+     * @param selectPageProductRequest
+     * @return
+     */
+    Map<String, Object> selectPageProductShop(@Valid SelectPageProductRequest selectPageProductRequest);
 }

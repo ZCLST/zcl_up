@@ -34,4 +34,11 @@ public interface ProductIndexService {
      * @param productIndexList
      */
     void batchSaveProductIndex(List<ProductIndex> productIndexList);
+
+    /**
+     * 分页查询商城商品
+     * @param selectPageProductRequest
+     * @return
+     */
+    Page<ProductIndex> selectPageProductShop(SelectPageProductRequest selectPageProductRequest);
 }

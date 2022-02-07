@@ -1,6 +1,7 @@
 package com.zcl.basic.product.biz.impl;
 
 import com.zcl.basic.product.biz.ProductBiz;
+import com.zcl.basic.product.dto.ProductStockDto;
 import com.zcl.basic.product.engine.model.ProductIndex;
 import com.zcl.basic.product.engine.service.ProductIndexService;
 import com.zcl.basic.product.model.Product;
@@ -10,6 +11,7 @@ import com.zcl.basic.product.request.SelectPageProductRequest;
 import com.zcl.basic.product.request.UpdateProductStatusRequest;
 import com.zcl.basic.product.service.ProductService;
 import com.zcl.basic.product.vo.ProductVo;
+import com.zcl.basic.warehouse.service.WarehouseService;
 import com.zcl.util.general.enums.StatusEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
@@ -37,10 +39,12 @@ import java.util.stream.Collectors;
 public class ProductBizImpl implements ProductBiz {
     private ProductService productService;
     private ProductIndexService productIndexService;
+    private WarehouseService warehouseService;
 
-    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService) {
+    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService) {
         this.productService = productService;
         this.productIndexService = productIndexService;
+        this.warehouseService = warehouseService;
     }
 
     @Override
@@ -48,16 +52,40 @@ public class ProductBizImpl implements ProductBiz {
         Page<ProductIndex> product = productIndexService.selectPageProduct(selectPageProductRequest);
         List<ProductVo> productVos = BeanUtil.convertList(product.getContent(), ProductVo.class);
         if (CollectionUtils.isNotEmpty(productVos)) {
-            //金额、库存取出除1W
-            productVos.stream().forEach(productVo -> {
-                BigDecimal money = MyBigDecimalUtil.divide(productVo.getProductMoney());
-                BigDecimal stock = MyBigDecimalUtil.divide(productVo.getStock());
-                productVo.setRealProductMoney(money);
-                productVo.setRealStock(stock);
-            });
+            //计算库存
+            this.handleStock(productVos);
+            //计算金额
+            this.handleMoney(productVos);
             return CommonResponse.setIndexPageResponse(productVos, productVos.size());
         }
         return CommonResponse.setIndexPageResponse(null, null);
+    }
+
+    private void handleMoney(List<ProductVo> productVos) {
+        //金额取出除1W
+        productVos.stream().forEach(productVo -> {
+            BigDecimal money = MyBigDecimalUtil.divide(productVo.getProductMoney());
+            productVo.setRealProductMoney(money);
+        });
+    }
+
+    private void handleStock(List<ProductVo> productVos) {
+        //查询商品库存，结果为空商品库存置为0
+        Map<String, ProductStockDto> map = new HashMap<>();
+        List<String> productIds = productVos.stream().map(productVo -> productVo.getProductId()).collect(Collectors.toList());
+        List<ProductStockDto> productStockDtoList = warehouseService.selectStock(productIds);
+        if(CollectionUtils.isNotEmpty(productStockDtoList)){
+            productStockDtoList.stream().forEach(productStockDto -> {
+                map.put(productStockDto.getProductId(), productStockDto);
+            });
+        }
+        productVos.stream().forEach(productVo -> {
+            if (map.containsKey(productVo.getProductId())) {
+                productVo.setRealStock(map.get(productVo.getProductId()).getStock());
+            }else{
+                productVo.setRealStock(new BigDecimal("0"));
+            }
+        });
     }
 
     @Override
@@ -69,7 +97,7 @@ public class ProductBizImpl implements ProductBiz {
             throw new ZfException("该商品编码已存在");
         }
         String uuid = UUID.randomUUID().toString();
-        if(StringUtils.isEmpty(productRequest.getProductUrl())){
+        if (StringUtils.isEmpty(productRequest.getProductUrl())) {
             productRequest.setProductUrl(OssUtil.GLOBAL_IMG_URL);
         }
         //存入数据库
@@ -86,7 +114,7 @@ public class ProductBizImpl implements ProductBiz {
         Product product = productService.findProductById(productUpdateRequest.getProductId());
         Assert.notNull(product, "该商品不存在");
         //判断商品编码是否重复
-        if(!StringUtils.equals(product.getProductCode(),productUpdateRequest.getProductCode())){
+        if (!StringUtils.equals(product.getProductCode(), productUpdateRequest.getProductCode())) {
             Product productByCode = productService.findProductByCode(productUpdateRequest.getProductCode());
             if (productByCode != null) {
                 throw new ZfException("该商品编码已存在");
@@ -127,8 +155,22 @@ public class ProductBizImpl implements ProductBiz {
     @Override
     public Map<String, Object> findProductById(String id) {
         Product product = productService.findProductById(id);
-        Assert.notNull(product,id+":该商品不存在");
+        Assert.notNull(product, id + ":该商品不存在");
         return CommonResponse.setResponseData(product);
+    }
+
+    @Override
+    public Map<String, Object> selectPageProductShop(SelectPageProductRequest selectPageProductRequest) {
+        Page<ProductIndex> product = productIndexService.selectPageProductShop(selectPageProductRequest);
+        List<ProductVo> productVos = BeanUtil.convertList(product.getContent(), ProductVo.class);
+        if (CollectionUtils.isNotEmpty(productVos)) {
+            //计算库存
+            this.handleStock(productVos);
+            //计算金额
+            this.handleMoney(productVos);
+            return CommonResponse.setIndexPageResponse(productVos, productVos.size());
+        }
+        return CommonResponse.setIndexPageResponse(null, null);
     }
 
     private void batchUpdateProductIndexStatus(List<Product> products, String flagValue) {
