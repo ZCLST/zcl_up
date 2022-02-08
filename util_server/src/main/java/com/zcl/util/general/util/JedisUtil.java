@@ -18,6 +18,10 @@ public class JedisUtil {
     private static int maxToal;
     private static int maxIdel;
     /**
+     * 购物车key
+     */
+    public static final String CART_KEY="usersId:%s:product_id:%s";
+    /**
      * 密码
      */
     private static String passWord;
@@ -41,8 +45,22 @@ public class JedisUtil {
         jedisPool = new JedisPool(jedisPoolConfig, host, port,timeOut,passWord);
     }
 
+    /**
+     * 获取JEDIS客户端
+     * @return
+     */
     public static Jedis getJedis() {
         return jedisPool.getResource();
+    }
+
+    /**
+     * 构建购物车key
+     * @param format
+     * @param args
+     * @return
+     */
+    public static String buildCartKey(String format,String... args){
+      return   String.format(format, args);
     }
 
 }
