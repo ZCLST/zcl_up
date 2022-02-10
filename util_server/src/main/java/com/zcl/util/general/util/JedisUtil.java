@@ -20,7 +20,11 @@ public class JedisUtil {
     /**
      * 购物车key
      */
-    public static final String CART_KEY="usersId:%s:product_id:%s";
+    public static final String CART_KEY="cart:usersId:%s";
+    /**
+     * 商品详情key
+     */
+    public static final String PRODUCT_KEY="productInfo:usersId:%s";
     /**
      * 密码
      */
@@ -59,7 +63,7 @@ public class JedisUtil {
      * @param args
      * @return
      */
-    public static String buildCartKey(String format,String... args){
+    public static String buildCartKey(String format,Object... args){
       return   String.format(format, args);
     }
 

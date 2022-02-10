@@ -1,10 +1,8 @@
 package com.zcl.basic.product.controller;
 
 import com.zcl.basic.product.biz.ProductBiz;
-import com.zcl.basic.product.request.ProductSaveRequest;
-import com.zcl.basic.product.request.ProductUpdateRequest;
-import com.zcl.basic.product.request.SelectPageProductRequest;
-import com.zcl.basic.product.request.UpdateProductStatusRequest;
+import com.zcl.basic.product.request.*;
+import org.elasticsearch.common.recycler.Recycler;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -37,11 +35,12 @@ public class ProductController {
 
     /**
      * 分页查询商城商品
+     *
      * @param selectPageProductRequest
      * @return
      */
     @PostMapping(value = "/selectPageProductShop.json")
-    public Map<String,Object> selectPageProductShop(@RequestBody SelectPageProductRequest selectPageProductRequest){
+    public Map<String, Object> selectPageProductShop(@RequestBody SelectPageProductRequest selectPageProductRequest) {
         return productBiz.selectPageProductShop(selectPageProductRequest);
     }
 
@@ -58,33 +57,44 @@ public class ProductController {
 
     /**
      * 更新商品
+     *
      * @param productUpdateRequest
      * @return
      */
     @PostMapping(value = "/updateProduct.json")
-    public Map<String,Object> updateProduct(@RequestBody ProductUpdateRequest productUpdateRequest){
+    public Map<String, Object> updateProduct(@RequestBody ProductUpdateRequest productUpdateRequest) {
         return productBiz.updateProduct(productUpdateRequest);
     }
 
     /**
      * 批量更新商品上下架状态
+     *
      * @param updateProductStatusRequest
      * @return
      */
     @PostMapping(value = "/updateProductStatus.json")
-    public Map<String,Object> updateProductStatus(@RequestBody UpdateProductStatusRequest updateProductStatusRequest){
+    public Map<String, Object> updateProductStatus(@RequestBody UpdateProductStatusRequest updateProductStatusRequest) {
         return productBiz.updateProductStatus(updateProductStatusRequest);
     }
 
     /**
      * 根据ID查询商品
+     *
      * @param id
      * @return
      */
     @GetMapping(value = "/findProductById.json")
-    public Map<String,Object> findProductById(String id){
+    public Map<String, Object> findProductById(String id) {
         return productBiz.findProductById(id);
     }
 
-    //todo 加入购物车
+    /**
+     * 加入购物车
+     * @param addCartRequest
+     * @return
+     */
+    @PostMapping(value = "/addCart.json")
+    public Map<String, Object> addCart(@RequestBody AddCartRequest addCartRequest) {
+        return productBiz.addCart(addCartRequest);
+    }
 }

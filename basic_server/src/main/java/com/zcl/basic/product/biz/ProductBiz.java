@@ -1,9 +1,6 @@
 package com.zcl.basic.product.biz;
 
-import com.zcl.basic.product.request.ProductSaveRequest;
-import com.zcl.basic.product.request.ProductUpdateRequest;
-import com.zcl.basic.product.request.SelectPageProductRequest;
-import com.zcl.basic.product.request.UpdateProductStatusRequest;
+import com.zcl.basic.product.request.*;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -64,4 +61,11 @@ public interface ProductBiz {
      * @return
      */
     Map<String, Object> selectPageProductShop(@Valid SelectPageProductRequest selectPageProductRequest);
+
+    /**
+     * 加入购物车
+     * @param addCartRequest
+     * @return
+     */
+    Map<String, Object> addCart(@Valid AddCartRequest addCartRequest);
 }

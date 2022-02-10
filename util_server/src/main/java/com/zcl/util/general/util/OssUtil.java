@@ -11,15 +11,10 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.zcl.util.general.exception.ZfException;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.unit.DataUnit;
 
 import java.io.InputStream;
-import java.util.UUID;
 
 /**
  * @author 曾小白

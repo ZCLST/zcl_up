@@ -1,31 +1,30 @@
 package com.zcl.basic.product.biz.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.zcl.basic.product.biz.ProductBiz;
+import com.zcl.basic.product.dto.CartDto;
+import com.zcl.basic.product.dto.CartItemDto;
 import com.zcl.basic.product.dto.ProductStockDto;
 import com.zcl.basic.product.engine.model.ProductIndex;
 import com.zcl.basic.product.engine.service.ProductIndexService;
 import com.zcl.basic.product.model.Product;
-import com.zcl.basic.product.request.ProductSaveRequest;
-import com.zcl.basic.product.request.ProductUpdateRequest;
-import com.zcl.basic.product.request.SelectPageProductRequest;
-import com.zcl.basic.product.request.UpdateProductStatusRequest;
+import com.zcl.basic.product.request.*;
 import com.zcl.basic.product.service.ProductService;
 import com.zcl.basic.product.vo.ProductVo;
 import com.zcl.basic.warehouse.service.WarehouseService;
 import com.zcl.util.general.enums.StatusEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
-import com.zcl.util.general.util.BeanUtil;
-import com.zcl.util.general.util.DateUtils;
-import com.zcl.util.general.util.MyBigDecimalUtil;
-import com.zcl.util.general.util.OssUtil;
+import com.zcl.util.general.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import redis.clients.jedis.Jedis;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -93,14 +92,14 @@ public class ProductBizImpl implements ProductBiz {
             if (StringUtils.equals(haveStock, StatusEnum.YES.getFlag())) {
                 BigDecimal bigDecimal = new BigDecimal("0.00");
                 List<ProductVo> collect = productVos.stream()
-                        .filter(productVo -> productVo.getRealStock().compareTo(bigDecimal)==1)
+                        .filter(productVo -> productVo.getRealStock().compareTo(bigDecimal) == 1)
                         .collect(Collectors.toList());
                 productVos.clear();
                 productVos.addAll(collect);
             } else {
                 BigDecimal bigDecimal = new BigDecimal("0.00");
                 List<ProductVo> collect = productVos.stream()
-                        .filter(productVo -> productVo.getRealStock().compareTo(bigDecimal)<1)
+                        .filter(productVo -> productVo.getRealStock().compareTo(bigDecimal) < 1)
                         .collect(Collectors.toList());
                 productVos.clear();
                 productVos.addAll(collect);
@@ -185,12 +184,68 @@ public class ProductBizImpl implements ProductBiz {
         List<ProductVo> productVos = BeanUtil.convertList(product.getContent(), ProductVo.class);
         if (CollectionUtils.isNotEmpty(productVos)) {
             //计算库存
-            this.handleStock(productVos,selectPageProductRequest.getHaveStock());
+            this.handleStock(productVos, selectPageProductRequest.getHaveStock());
             //计算金额
             this.handleMoney(productVos);
             return CommonResponse.setIndexPageResponse(productVos, productVos.size());
         }
         return CommonResponse.setIndexPageResponse(null, null);
+    }
+
+    @Override
+    public Map<String, Object> addCart(AddCartRequest addCartRequest) {
+        //判断redis是否存在，存在则添加数量，不存在则数量为1
+        Jedis jedis = JedisUtil.getJedis();
+        String key = JedisUtil.buildCartKey(JedisUtil.CART_KEY, addCartRequest.getUserId());
+        if(jedis.exists(key)){
+            //处理购物车
+            this.handleCart(jedis,key,addCartRequest);
+        }else{
+            //创建购物车
+            this.buildCart(jedis,key,addCartRequest);
+        }
+        return CommonResponse.setResponseData(null);
+    }
+
+    private void buildCart(Jedis jedis,String key, AddCartRequest addCartRequest) {
+        CartDto cartDto = new CartDto();
+        this.addCartItem(cartDto, addCartRequest.getProductId(), 1);
+        String jsonString = JSON.toJSONString(cartDto);
+        jedis.set(key,jsonString);
+    }
+
+    private void handleCart(Jedis jedis,String key,AddCartRequest addCartRequest) {
+        String str = jedis.get(key);
+        CartDto cartDto = JSON.parseObject(str, CartDto.class);
+        //存在相同明细数量+1
+        List<String> productIds = cartDto.getCartItemDtoList().stream().map(cartItemDto -> cartItemDto.getProductId()).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(productIds)){
+            if(productIds.contains(addCartRequest.getProductId())){
+                cartDto.getCartItemDtoList().forEach(cartItemDto -> {
+                    if(StringUtils.equals(addCartRequest.getProductId(), cartItemDto.getProductId())){
+                        cartItemDto.setNum(cartItemDto.getNum()+1);
+                    }
+                });
+            }else{
+                //添加购物车明细
+                this.addCartItem(cartDto,addCartRequest.getProductId(),1);
+            }
+        }else{
+            this.addCartItem(cartDto,addCartRequest.getProductId(),1);
+        }
+        String jsonString = JSON.toJSONString(cartDto);
+        jedis.set(key,jsonString);
+    }
+
+    private void addCartItem(CartDto cartDto, String productId, int num) {
+        CartItemDto cartItemDto = new CartItemDto(productId,num);
+        if(cartDto.getCartItemDtoList()==null){
+            List<CartItemDto> cartItemDtoList = new ArrayList<>();
+            cartItemDtoList.add(cartItemDto);
+            cartDto.setCartItemDtoList(cartItemDtoList);
+        }else{
+            cartDto.getCartItemDtoList().add(cartItemDto);
+        }
     }
 
     private void batchUpdateProductIndexStatus(List<Product> products, String flagValue) {
