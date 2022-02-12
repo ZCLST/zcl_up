@@ -11,7 +11,10 @@ import com.zcl.basic.product.model.Product;
 import com.zcl.basic.product.request.*;
 import com.zcl.basic.product.service.ProductService;
 import com.zcl.basic.product.vo.ProductVo;
+import com.zcl.basic.redisqueue.model.RedisQueue;
+import com.zcl.basic.redisqueue.service.RedisQueueService;
 import com.zcl.basic.warehouse.service.WarehouseService;
+import com.zcl.util.general.enums.ActionTypeEnum;
 import com.zcl.util.general.enums.StatusEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
@@ -40,11 +43,13 @@ public class ProductBizImpl implements ProductBiz {
     private ProductService productService;
     private ProductIndexService productIndexService;
     private WarehouseService warehouseService;
+    private RedisQueueService redisQueueService;
 
-    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService) {
+    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService, RedisQueueService redisQueueService) {
         this.productService = productService;
         this.productIndexService = productIndexService;
         this.warehouseService = warehouseService;
+        this.redisQueueService = redisQueueService;
     }
 
     @Override
@@ -121,6 +126,8 @@ public class ProductBizImpl implements ProductBiz {
         }
         //存入数据库
         this.saveProduct(productRequest, uuid);
+        //添加缓存队列
+        this.buildProductInfoRedisQueue(uuid);
         //存入ES
         this.saveProductIndex(productRequest, uuid);
         return CommonResponse.setResponseData(null);
@@ -141,6 +148,8 @@ public class ProductBizImpl implements ProductBiz {
         }
         //更新数据库数据
         this.updateProductDb(product, productUpdateRequest);
+        //添加缓存队列
+        this.buildProductInfoRedisQueue(product.getProductId());
         //更新ES
         this.updateProductIndex(product, productUpdateRequest);
         return CommonResponse.setResponseData(null);
@@ -166,10 +175,24 @@ public class ProductBizImpl implements ProductBiz {
         }
         //更新数据库数据
         this.batchUpdateProductStatusDb(oldIdList, flagValue);
+        //批量添加缓存队列
+        this.buildBatchProductInfoRedisQueue(oldIdList);
         //更新ES
         this.batchUpdateProductIndexStatus(products, flagValue);
         return CommonResponse.setResponseData(null);
     }
+
+    private void buildBatchProductInfoRedisQueue(List<String> oldIdList) {
+        List<RedisQueue> redisQueues = new ArrayList<>();
+        oldIdList.stream().forEach(id->{
+            RedisQueue redisQueue = new RedisQueue();
+            redisQueue.setEntityId(id);
+            redisQueue.setActionType(ActionTypeEnum.PRODUCT_ACTION.getCode());
+            redisQueues.add(redisQueue);
+        });
+        redisQueueService.saveBatch(redisQueues);
+    }
+
 
     @Override
     public Map<String, Object> findProductById(String id) {
@@ -193,57 +216,72 @@ public class ProductBizImpl implements ProductBiz {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> addCart(AddCartRequest addCartRequest) {
         //判断redis是否存在，存在则添加数量，不存在则数量为1
         Jedis jedis = JedisUtil.getJedis();
-        String key = JedisUtil.buildCartKey(JedisUtil.CART_KEY, addCartRequest.getUserId());
-        if(jedis.exists(key)){
+        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, addCartRequest.getUserId());
+        if (jedis.exists(key)) {
             //处理购物车
-            this.handleCart(jedis,key,addCartRequest);
-        }else{
+            this.handleCart(jedis, key, addCartRequest);
+        } else {
             //创建购物车
-            this.buildCart(jedis,key,addCartRequest);
+            this.buildCart(jedis, key, addCartRequest);
         }
         return CommonResponse.setResponseData(null);
     }
 
-    private void buildCart(Jedis jedis,String key, AddCartRequest addCartRequest) {
+    private void buildCart(Jedis jedis, String key, AddCartRequest addCartRequest) {
         CartDto cartDto = new CartDto();
         this.addCartItem(cartDto, addCartRequest.getProductId(), 1);
         String jsonString = JSON.toJSONString(cartDto);
-        jedis.set(key,jsonString);
+        jedis.set(key, jsonString);
+        String productInfoKey = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, addCartRequest.getProductId());
+        //添加的商品不存在与redis中就添加至redis
+        if (!jedis.exists(productInfoKey)) {
+            Product product = productService.findProductById(addCartRequest.getProductId());
+            String json = JSON.toJSONString(product);
+            jedis.set(productInfoKey, json);
+        }
     }
 
-    private void handleCart(Jedis jedis,String key,AddCartRequest addCartRequest) {
+    private void handleCart(Jedis jedis, String key, AddCartRequest addCartRequest) {
         String str = jedis.get(key);
         CartDto cartDto = JSON.parseObject(str, CartDto.class);
         //存在相同明细数量+1
         List<String> productIds = cartDto.getCartItemDtoList().stream().map(cartItemDto -> cartItemDto.getProductId()).collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(productIds)){
-            if(productIds.contains(addCartRequest.getProductId())){
+        if (CollectionUtils.isNotEmpty(productIds)) {
+            if (productIds.contains(addCartRequest.getProductId())) {
                 cartDto.getCartItemDtoList().forEach(cartItemDto -> {
-                    if(StringUtils.equals(addCartRequest.getProductId(), cartItemDto.getProductId())){
-                        cartItemDto.setNum(cartItemDto.getNum()+1);
+                    if (StringUtils.equals(addCartRequest.getProductId(), cartItemDto.getProductId())) {
+                        cartItemDto.setNum(cartItemDto.getNum() + 1);
                     }
                 });
-            }else{
+            } else {
                 //添加购物车明细
-                this.addCartItem(cartDto,addCartRequest.getProductId(),1);
+                this.addCartItem(cartDto, addCartRequest.getProductId(), 1);
             }
-        }else{
-            this.addCartItem(cartDto,addCartRequest.getProductId(),1);
+        } else {
+            this.addCartItem(cartDto, addCartRequest.getProductId(), 1);
         }
         String jsonString = JSON.toJSONString(cartDto);
-        jedis.set(key,jsonString);
+        jedis.set(key, jsonString);
+        String productInfoKey = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, addCartRequest.getProductId());
+        //添加的商品不存在与redis中就添加至redis
+        if (!jedis.exists(productInfoKey)) {
+            Product product = productService.findProductById(addCartRequest.getProductId());
+            String json = JSON.toJSONString(product);
+            jedis.set(productInfoKey, json);
+        }
     }
 
     private void addCartItem(CartDto cartDto, String productId, int num) {
-        CartItemDto cartItemDto = new CartItemDto(productId,num);
-        if(cartDto.getCartItemDtoList()==null){
+        CartItemDto cartItemDto = new CartItemDto(productId, num);
+        if (cartDto.getCartItemDtoList() == null) {
             List<CartItemDto> cartItemDtoList = new ArrayList<>();
             cartItemDtoList.add(cartItemDto);
             cartDto.setCartItemDtoList(cartItemDtoList);
-        }else{
+        } else {
             cartDto.getCartItemDtoList().add(cartItemDto);
         }
     }
@@ -298,6 +336,13 @@ public class ProductBizImpl implements ProductBiz {
         product.setCreateTime(date);
         product.setProductId(uuid);
         productService.saveProduct(product);
+    }
+
+    private void buildProductInfoRedisQueue(String productId) {
+        RedisQueue redisQueue = new RedisQueue();
+        redisQueue.setEntityId(productId);
+        redisQueue.setActionType(ActionTypeEnum.PRODUCT_ACTION.getCode());
+        redisQueueService.save(redisQueue);
     }
 
     private void saveProductIndex(ProductSaveRequest productRequest, String uuid) {

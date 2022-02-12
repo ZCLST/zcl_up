@@ -24,7 +24,7 @@ public class JedisUtil {
     /**
      * 商品详情key
      */
-    public static final String PRODUCT_KEY="productInfo:usersId:%s";
+    public static final String PRODUCT_KEY="productInfo:productId:%s";
     /**
      * 密码
      */
@@ -63,8 +63,9 @@ public class JedisUtil {
      * @param args
      * @return
      */
-    public static String buildCartKey(String format,Object... args){
+    public static String buildKey(String format,Object... args){
       return   String.format(format, args);
     }
+
 
 }
