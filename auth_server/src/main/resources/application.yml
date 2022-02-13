@@ -17,8 +17,8 @@ eureka:
   healthcheck.enable: true #开启健康检查
   instance:
     prefer-ip-address: true # 当调用gapplication.ymletHostname获取实例的hostname时，返回ip而不是host名称
-    lease-renewal-interval-in-seconds: 3
-    lease-expiration-duration-in-seconds: 6
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 20
 #持久层 mybatis-plus
 mybatis-plus:
   configuration:
@@ -42,9 +42,11 @@ feign:
   #  HEADERS:在BASIC的基础上记录请求和响应头信息 FULL：记录所有
   client:
     config:
-      productserver: #指明查看服务日志名称
+      basicserver: #指明查看服务日志名称
+        connectTimeout: 5000 #建立链接超时时长
+        readTimeout: 5000 #读取超时时长
         loggerLevel: FULL
-  #开启hystrix
+  #开启trix
 #  hystrix:
 #    enabled: true
 #    command:
@@ -55,5 +57,6 @@ feign:
 #              timeoutInMilliseconds: 3000 #默认连接超时时间为1秒
 logging:
   level:
-    com.zcl.anth.user.feign.MenuFeignClient: debug
+    com.zcl.anth.feign.log.client.LogFeignClient: debug
+
 

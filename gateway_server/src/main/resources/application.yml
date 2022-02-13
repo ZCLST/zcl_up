@@ -26,6 +26,8 @@ eureka:
       defaultZone: http://127.0.0.1:8071/eureka/
   instance:
     prefer-ip-address: true # 当调用gapplication.ymletHostname获取实例的hostname时，返回ip而不是host名称
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 20
 #提高日志级别为WARN
 logging:
   level:

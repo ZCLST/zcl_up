@@ -68,4 +68,11 @@ public interface ProductBiz {
      * @return
      */
     Map<String, Object> addCart(@Valid AddCartRequest addCartRequest);
+
+    /**
+     * 查看购物车
+     * @param showCartRequest
+     * @return
+     */
+    Map<String, Object> showCart(@Valid ShowCartRequest showCartRequest);
 }

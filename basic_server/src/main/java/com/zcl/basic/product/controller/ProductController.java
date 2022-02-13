@@ -97,4 +97,16 @@ public class ProductController {
     public Map<String, Object> addCart(@RequestBody AddCartRequest addCartRequest) {
         return productBiz.addCart(addCartRequest);
     }
+
+    /**
+     * 查看购物车
+     * @param showCartRequest
+     * @return
+     */
+    @PostMapping(value = "/showCart.json")
+    public Map<String,Object> showCart(@RequestBody ShowCartRequest showCartRequest){
+        return productBiz.showCart(showCartRequest);
+    }
+
+
 }

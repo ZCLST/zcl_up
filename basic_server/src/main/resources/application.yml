@@ -9,21 +9,6 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/zf?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&&failOverReadOnly=false
     username: root
     password: root
-  #配置rabbitMq 服务器
-  rabbitmq:
-    addresses: 127.0.0.1:5672
-    username: guest
-    password: guest
-    connection-timeout: 15000
-    #开启消费重试
-    listener:
-      simple:
-        retry:
-          enabled: true
-          max-attempts: 3 #最大重试次数
-        acknowledge-mode: manual  #手动签收模式开启
-    publisher-confirm-type: correlated  #确认消息已发送到交换机(Exchange)
-    publisher-returns: true #确认消息已发送到队列(Queue)
 #eureka配置
 eureka:
   client:
@@ -31,6 +16,8 @@ eureka:
       defaultZone: http://127.0.0.1:8071/eureka/
   instance:
     prefer-ip-address: true # 当调用gapplication.ymletHostname获取实例的hostname时，返回ip而不是host名称
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 20
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
@@ -39,26 +26,57 @@ mybatis-plus:
     cache-enabled: false #禁用缓存
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   type-aliases-package: com.zcl.basic.*.model #实体对象扫描，减少xml编写
+#feign配置
+feign:
+  compression:
+    request:
+      enabled: true #开启请求压缩
+      mime-types: application/json,text/html #设置压缩的数据类型
+      min-request-size: 2048 #设置触发压缩的最小下限
+    response:
+      enabled: true #开启响应压缩
+  #配置feign的日志输出
+  #  NONE：不输出日志（性能高） BASIC：适用于生产环境的问题追踪
+  #  HEADERS:在BASIC的基础上记录请求和响应头信息 FULL：记录所有
+  client:
+    config:
+      authserver: #指明查看服务日志名称
+        connectTimeout: 5000 #建立链接超时时长
+        readTimeout: 5000 #读取超时时长
+        loggerLevel: FULL
+  #开启hystrix
+#  hystrix:
+#    enabled: true
+#    command:
+#      default:
+#        execution:
+#          isolation:
+#            thread:
+#              timeoutInMilliseconds: 3000 #默认连接超时时间为1秒
+logging:
+  level:
+    com.zcl.anth.feign.user.client.UserFeignClient: debug
+
 #XXL_JOB配置
 ### 调度中心部署跟地址 [选填]：如调度中心集群部署存在多个地址则用逗号分隔。执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"；为空则关闭自动注册；
-xxl:
-  job:
-    admin:
-      addresses: http://101.35.48.198:8080/xxl-job-admin
-    ### 执行器通讯TOKEN [选填]：非空时启用；
-    accessToken:
-  ### 执行器AppName [选填]：执行器心跳注册分组依据；为空则关闭自动注册
-    executor:
-      appname: xxl-job-executor-basic
-  ### 执行器注册 [选填]：优先使用该配置作为注册地址，为空时使用内嵌服务 ”IP:PORT“ 作为注册地址。从而更灵活的支持容器类型执行器动态IP和动态映射端口问题。
-      address:
-  ### 执行器IP [选填]：默认为空表示自动获取IP，多网卡时可手动设置指定IP，该IP不会绑定Host仅作为通讯实用；地址信息用于 "执行器注册" 和 "调度中心请求并触发任务"；
-      ip:
-  ### 执行器端口号 [选填]：小于等于0则自动获取；默认端口为9999，单机部署多个执行器时，注意要配置不同执行器端口；
-      port: 9999
-  ### 执行器运行日志文件存储磁盘路径 [选填] ：需要对该路径拥有读写权限；为空则使用默认路径；
-      logpath: /data/applogs/xxl-job/jobhandler
-  ### 执行器日志文件保存天数 [选填] ： 过期日志自动清理, 限制值大于等于3时生效; 否则, 如-1, 关闭自动清理功能；
-      logretentiondays: 10
+#xxl:
+#  job:
+#    admin:
+#      addresses: http://101.35.48.198:8080/xxl-job-admin
+#    ### 执行器通讯TOKEN [选填]：非空时启用；
+#    accessToken:
+#  ### 执行器AppName [选填]：执行器心跳注册分组依据；为空则关闭自动注册
+#    executor:
+#      appname: xxl-job-executor-basic
+#  ### 执行器注册 [选填]：优先使用该配置作为注册地址，为空时使用内嵌服务 ”IP:PORT“ 作为注册地址。从而更灵活的支持容器类型执行器动态IP和动态映射端口问题。
+#      address:
+#  ### 执行器IP [选填]：默认为空表示自动获取IP，多网卡时可手动设置指定IP，该IP不会绑定Host仅作为通讯实用；地址信息用于 "执行器注册" 和 "调度中心请求并触发任务"；
+#      ip:
+#  ### 执行器端口号 [选填]：小于等于0则自动获取；默认端口为9999，单机部署多个执行器时，注意要配置不同执行器端口；
+#      port: 9999
+#  ### 执行器运行日志文件存储磁盘路径 [选填] ：需要对该路径拥有读写权限；为空则使用默认路径；
+#      logpath: /data/applogs/xxl-job/jobhandler
+#  ### 执行器日志文件保存天数 [选填] ： 过期日志自动清理, 限制值大于等于3时生效; 否则, 如-1, 关闭自动清理功能；
+#      logretentiondays: 10
 
 

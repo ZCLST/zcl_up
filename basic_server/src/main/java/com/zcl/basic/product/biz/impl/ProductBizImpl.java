@@ -1,6 +1,7 @@
 package com.zcl.basic.product.biz.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.zcl.basic.feign.user.client.UserFeignClient;
 import com.zcl.basic.product.biz.ProductBiz;
 import com.zcl.basic.product.dto.CartDto;
 import com.zcl.basic.product.dto.CartItemDto;
@@ -10,6 +11,8 @@ import com.zcl.basic.product.engine.service.ProductIndexService;
 import com.zcl.basic.product.model.Product;
 import com.zcl.basic.product.request.*;
 import com.zcl.basic.product.service.ProductService;
+import com.zcl.basic.product.vo.CartItemVo;
+import com.zcl.basic.product.vo.CartVo;
 import com.zcl.basic.product.vo.ProductVo;
 import com.zcl.basic.redisqueue.model.RedisQueue;
 import com.zcl.basic.redisqueue.service.RedisQueueService;
@@ -44,12 +47,14 @@ public class ProductBizImpl implements ProductBiz {
     private ProductIndexService productIndexService;
     private WarehouseService warehouseService;
     private RedisQueueService redisQueueService;
+    private UserFeignClient userFeignClient;
 
-    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService, RedisQueueService redisQueueService) {
+    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService, RedisQueueService redisQueueService, UserFeignClient userFeignClient) {
         this.productService = productService;
         this.productIndexService = productIndexService;
         this.warehouseService = warehouseService;
         this.redisQueueService = redisQueueService;
+        this.userFeignClient = userFeignClient;
     }
 
     @Override
@@ -127,7 +132,7 @@ public class ProductBizImpl implements ProductBiz {
         //存入数据库
         this.saveProduct(productRequest, uuid);
         //添加缓存队列
-        this.buildProductInfoRedisQueue(uuid);
+//        this.buildProductInfoRedisQueue(uuid);
         //存入ES
         this.saveProductIndex(productRequest, uuid);
         return CommonResponse.setResponseData(null);
@@ -149,7 +154,7 @@ public class ProductBizImpl implements ProductBiz {
         //更新数据库数据
         this.updateProductDb(product, productUpdateRequest);
         //添加缓存队列
-        this.buildProductInfoRedisQueue(product.getProductId());
+//        this.buildProductInfoRedisQueue(product.getProductId());
         //更新ES
         this.updateProductIndex(product, productUpdateRequest);
         return CommonResponse.setResponseData(null);
@@ -176,7 +181,7 @@ public class ProductBizImpl implements ProductBiz {
         //更新数据库数据
         this.batchUpdateProductStatusDb(oldIdList, flagValue);
         //批量添加缓存队列
-        this.buildBatchProductInfoRedisQueue(oldIdList);
+//        this.buildBatchProductInfoRedisQueue(oldIdList);
         //更新ES
         this.batchUpdateProductIndexStatus(products, flagValue);
         return CommonResponse.setResponseData(null);
@@ -184,7 +189,7 @@ public class ProductBizImpl implements ProductBiz {
 
     private void buildBatchProductInfoRedisQueue(List<String> oldIdList) {
         List<RedisQueue> redisQueues = new ArrayList<>();
-        oldIdList.stream().forEach(id->{
+        oldIdList.stream().forEach(id -> {
             RedisQueue redisQueue = new RedisQueue();
             redisQueue.setEntityId(id);
             redisQueue.setActionType(ActionTypeEnum.PRODUCT_ACTION.getCode());
@@ -218,6 +223,8 @@ public class ProductBizImpl implements ProductBiz {
     @Override
     @Transactional
     public Map<String, Object> addCart(AddCartRequest addCartRequest) {
+        Object userByUid = userFeignClient.findUserByUid(addCartRequest.getUserId());
+        Assert.notNull(userByUid, "该用户不存在！");
         //判断redis是否存在，存在则添加数量，不存在则数量为1
         Jedis jedis = JedisUtil.getJedis();
         String key = JedisUtil.buildKey(JedisUtil.CART_KEY, addCartRequest.getUserId());
@@ -229,6 +236,49 @@ public class ProductBizImpl implements ProductBiz {
             this.buildCart(jedis, key, addCartRequest);
         }
         return CommonResponse.setResponseData(null);
+    }
+
+    @Override
+    public Map<String, Object> showCart(ShowCartRequest showCartRequest) {
+        Object userByUid = userFeignClient.findUserByUid(showCartRequest.getUserId());
+        Assert.notNull(userByUid, "该用户不存在!");
+        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, showCartRequest.getUserId());
+        Jedis jedis = JedisUtil.getJedis();
+        if (jedis.exists(key)) {
+            String str = jedis.get(key);
+            //构建cartVo
+            CartVo cartVo = this.buildCartVo(jedis,str);
+            //查询条件不为空,加工VO
+            this.handleQuery(cartVo,showCartRequest);
+            return CommonResponse.setResponseData(cartVo);
+        } else {
+            return CommonResponse.setResponseData(null);
+        }
+    }
+
+    private void handleQuery(CartVo cartVo,ShowCartRequest showCartRequest) {
+        if(StringUtils.isNotBlank(showCartRequest.getProductCodeOrName())){
+
+        }
+    }
+
+    private CartVo buildCartVo(Jedis jedis,String str) {
+        CartVo cartVo = new CartVo();
+        List<CartItemVo> cartItemVos = new ArrayList<>();
+        CartDto cartDto = JSON.parseObject(str, CartDto.class);
+        List<CartItemDto> cartItemDtoList = cartDto.getCartItemDtoList();
+        cartItemDtoList.stream().forEach(cartItemDto -> {
+            String productId = cartItemDto.getProductId();
+            Integer num = cartItemDto.getNum();
+            //从缓存中取出商品详情
+            String json = jedis.get(JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, productId));
+            Product product = JSON.parseObject(json, Product.class);
+            CartItemVo cartItemVo = BeanUtil.convert(product, CartItemVo.class);
+            cartItemVo.setNum(num);
+            cartItemVos.add(cartItemVo);
+        });
+        cartVo.setCartItemVos(cartItemVos);
+        return cartVo;
     }
 
     private void buildCart(Jedis jedis, String key, AddCartRequest addCartRequest) {
