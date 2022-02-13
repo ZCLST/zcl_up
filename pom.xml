@@ -13,6 +13,7 @@
         <module>auth_server</module>
         <module>order_server</module>
         <module>basic_server</module>
+        <module>zuul_server</module>
     </modules>
 
     <!--全局版本管理-->

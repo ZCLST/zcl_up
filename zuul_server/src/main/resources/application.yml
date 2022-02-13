@@ -1,0 +1,56 @@
+server:
+  port: 8180
+spring:
+  application:
+    name: zuulserver # 应用名称，会在Eureka中显示
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 120MB
+  #需要忽略的头部信息，不在传播到其他服务
+zuul:
+  semaphore:
+    max-semaphores:
+  max:
+    host:
+      connections: 10000
+  ribbon-isolation-strategy: THREAD
+  thread-pool:
+    use-separate-thread-pools: true #每个路由都有自己的线程池，而不是共享一个。
+    thread-pool-key-prefix: zuulgw #会指定一个线程池前缀方便调试
+  retryable: true
+  sensitive-headers: Access-Control-Allow-Origin,Access-Control-Allow-Methods
+  ignored-headers: Access-Control-Allow-Origin,H-APP-Id,Token,APPToken
+  ribbon:
+    eager-load:
+      enabled: true
+  host:
+    connect-timeout-millis: 40000
+    connection-request-timeout-millis: 40000
+#解决504方案
+ribbon:
+  ReadTimeout: 120000  #请求处理的超时时间
+  ConnectTimeout: 30000  #请求连接的超时时间
+  MaxTotalHttpConnections: 1000     #最大http连接数
+  MaxConnectionsPerHost: 1000        #每个host最大连接数
+  OkToRetryOnAllOperations: true     #全部请求开启重试机制
+  MaxAutoRetries: 1 #同一台实例最大重试次数,不包括首次调用
+  MaxAutoRetriesNextServer: 1 #重试负载均衡其他的实例最大重试次数,不包括首次调用
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: THREAD
+  threadpool:
+    default:
+      coreSize: 500 #并发执行的最大线程数，默认10
+      maxQueueSize: 1000 #BlockingQueue的最大队列数，默认值-1
+      queueSizeRejectionThreshold: 800 #即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝，默认值5
+#eureka配置
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8071/eureka/
+  instance:
+    prefer-ip-address: true # 当调用getHostname获取实例的hostname时，返回ip而不是host名称
