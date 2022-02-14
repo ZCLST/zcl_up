@@ -36,7 +36,7 @@ public class ProductIndexServiceImpl implements ProductIndexService {
     public Page<ProductIndex> selectPageProduct(SelectPageProductRequest selectPageProductRequest) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         //设置查询条件
-        this.setQuery(boolQueryBuilder, selectPageProductRequest);
+        this.setManagerQuery(boolQueryBuilder, selectPageProductRequest);
         //设置分页和排序
         PageRequest pageRequest = this.setPageAndOrder(selectPageProductRequest);
         Page<ProductIndex> search = productIndexRepository.search(boolQueryBuilder, pageRequest);
@@ -74,6 +74,29 @@ public class ProductIndexServiceImpl implements ProductIndexService {
         Sort sort = Sort.by(orders);
         PageRequest pageRequest = PageRequest.of(selectPageProductRequest.getPageNum(), selectPageProductRequest.getPageSize(), sort);
         return pageRequest;
+    }
+
+    private void setManagerQuery(BoolQueryBuilder boolQueryBuilder, SelectPageProductRequest selectPageProductRequest) {
+        //商品编码
+        if (StringUtils.isNotBlank(selectPageProductRequest.getProductCode())) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.PRODUCT_CODE, selectPageProductRequest.getProductCode()));
+        }
+        //商品名称
+        if (StringUtils.isNotBlank(selectPageProductRequest.getProductName())) {
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(ProductIndex.PRODUCT_NAME, "*" + selectPageProductRequest.getProductName() + "*"));
+        }
+        //有无库存
+//        if (StringUtils.isNotBlank(selectPageProductRequest.getHaveStock())) {
+//            if (StringUtils.equals(StatusEnum.YES.getFlag(), selectPageProductRequest.getHaveStock())) {
+//                boolQueryBuilder.must(QueryBuilders.rangeQuery(ProductIndex.STOCK).gt(0L));
+//            } else {
+//                boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STOCK, 0L));
+//            }
+//        }
+        //是否启用
+        if (StringUtils.isNotBlank(selectPageProductRequest.getStatus())) {
+            boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STATUS, selectPageProductRequest.getStatus()));
+        }
     }
 
     private void setQuery(BoolQueryBuilder boolQueryBuilder, SelectPageProductRequest selectPageProductRequest) {

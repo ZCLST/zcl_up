@@ -3,7 +3,10 @@ package com.zcl.basic.log.biz;
 import com.zcl.basic.log.dto.ActionDto;
 import com.zcl.basic.log.dto.LogDto;
 import com.zcl.basic.log.request.FunctionLogRequest;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +19,7 @@ import java.util.Map;
  * @desc    日志业务层
 
  **/
+@Validated
 public interface LogBiz {
     /**
      * 动态分页查询功能日志
@@ -42,5 +46,12 @@ public interface LogBiz {
      * @param logDto
      * @return
      */
-    Map<String, Object> saveLog(LogDto logDto);
+    Map<String, Object> saveLog(@Valid LogDto logDto);
+
+    /**
+     * 保存功能日志
+     * @param functionId
+     * @return
+     */
+    Map<String, Object> saveFunLog(@NotBlank(message = "functionId不能为空") String functionId);
 }

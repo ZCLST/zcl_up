@@ -66,7 +66,8 @@ public class ProductBizImpl implements ProductBiz {
             this.handleStock(productVos, selectPageProductRequest.getHaveStock());
             //计算金额
             this.handleMoney(productVos);
-            return CommonResponse.setIndexPageResponse(productVos, productVos.size());
+            int totalElements = (int) product.getTotalElements();
+            return CommonResponse.setIndexPageResponse(productVos,totalElements);
         }
         return CommonResponse.setIndexPageResponse(null, null);
     }

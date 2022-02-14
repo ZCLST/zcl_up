@@ -20,8 +20,8 @@ public enum LogTypeEnum {
     ROLE_MAN("8", "角色管理"),
     USER_MAN("9", "用户管理"),
     MENU_MAN("10", "菜单管理"),
-    PRD_LIST("11", "商品列表"),
-    PRD_SALE("12", "商品销量详情"),
+    PRODUCT_MANAGER("11", "商品管理"),
+    PRODUCT_SHOP("12", "商城"),
     PRD_PRODUCE("13", "商品产量详情");
     private String code;
     private String desc;
