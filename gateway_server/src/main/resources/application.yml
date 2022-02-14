@@ -1,5 +1,9 @@
 server:
   port: 8172
+  tomcat:
+    threads:
+      max: 1000 #设置 Tomcat 最大线程数（表示 Tomcat 处理请求的线程池大小，即为 Tomcat 的并发处理能力）
+    accept-count: 200 #设置 Tomcat 最大连接数（表示等待 Tomcat 线程处理的请求队列大小）
 spring:
   application:
     name: gatewayserver # 应用名称，会在Eureka中显示
@@ -28,6 +32,12 @@ eureka:
     prefer-ip-address: true # 当调用gapplication.ymletHostname获取实例的hostname时，返回ip而不是host名称
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 20
+#ribbon配置
+ribbon:
+  # Connect timeout used by Apache HttpClient
+  ConnectTimeout: 200000
+  # Read timeout used by Apache HttpClient
+  ReadTimeout: 200000
 #提高日志级别为WARN
 logging:
   level:

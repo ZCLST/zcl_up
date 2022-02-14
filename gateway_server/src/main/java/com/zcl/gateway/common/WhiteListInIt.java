@@ -20,7 +20,8 @@ public class WhiteListInIt {
     static {
         Map<String, String> yml = YmlInIt.init();
         String[] lists = yml.get("whitelist").split(",");
-        String onSwitch = yml.get("onswitch");
+        String off = yml.get("onswitch");
+        onSwitch=off;
         if (lists.length == 0 || StringUtils.isEmpty(lists[0])) {
             throw new Error("未配置白名单！");
         }
