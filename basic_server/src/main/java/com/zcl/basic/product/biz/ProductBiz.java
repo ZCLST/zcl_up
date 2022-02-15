@@ -64,10 +64,10 @@ public interface ProductBiz {
 
     /**
      * 加入购物车
-     * @param addCartRequest
+     * @param productId
      * @return
      */
-    Map<String, Object> addCart(@Valid AddCartRequest addCartRequest);
+    Map<String, Object> addCart(String productId);
 
     /**
      * 查看购物车

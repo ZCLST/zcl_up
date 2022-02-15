@@ -90,12 +90,12 @@ public class ProductController {
 
     /**
      * 加入购物车
-     * @param addCartRequest
+     * @param productId
      * @return
      */
     @PostMapping(value = "/addCart.json")
-    public Map<String, Object> addCart(@RequestBody AddCartRequest addCartRequest) {
-        return productBiz.addCart(addCartRequest);
+    public Map<String, Object> addCart(@RequestBody String productId) {
+        return productBiz.addCart(productId);
     }
 
     /**

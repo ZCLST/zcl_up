@@ -223,12 +223,16 @@ public class ProductBizImpl implements ProductBiz {
 
     @Override
     @Transactional
-    public Map<String, Object> addCart(AddCartRequest addCartRequest) {
-        Object userByUid = userFeignClient.findUserByUid(addCartRequest.getUserId());
+    public Map<String, Object> addCart(String productId) {
+        String userId = ContextUtils.getUserId();
+        Object userByUid = userFeignClient.findUserByUid(userId);
         Assert.notNull(userByUid, "该用户不存在！");
         //判断redis是否存在，存在则添加数量，不存在则数量为1
         Jedis jedis = JedisUtil.getJedis();
-        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, addCartRequest.getUserId());
+        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, userId);
+        AddCartRequest addCartRequest = new AddCartRequest();
+        addCartRequest.setUserId(userId);
+        addCartRequest.setProductId(productId);
         if (jedis.exists(key)) {
             //处理购物车
             this.handleCart(jedis, key, addCartRequest);
@@ -285,12 +289,13 @@ public class ProductBizImpl implements ProductBiz {
     private void buildCart(Jedis jedis, String key, AddCartRequest addCartRequest) {
         CartDto cartDto = new CartDto();
         this.addCartItem(cartDto, addCartRequest.getProductId(), 1);
+        Product product = productService.findProductById(addCartRequest.getProductId());
+        Assert.notNull(product,"该商品不存在");
         String jsonString = JSON.toJSONString(cartDto);
         jedis.set(key, jsonString);
         String productInfoKey = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, addCartRequest.getProductId());
         //添加的商品不存在与redis中就添加至redis
         if (!jedis.exists(productInfoKey)) {
-            Product product = productService.findProductById(addCartRequest.getProductId());
             String json = JSON.toJSONString(product);
             jedis.set(productInfoKey, json);
         }
