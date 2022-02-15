@@ -7,6 +7,21 @@ server:
 spring:
   application:
     name: basicserver # 应用名称，会在Eureka中显示
+#配置rabbitMq 服务器
+  rabbitmq:
+    addresses: 47.96.131.142:5672
+    username: guest
+    password: guest
+    connection-timeout: 15000
+    #开启消费重试
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3 #最大重试次数
+        acknowledge-mode: manual  #手动签收模式开启
+    publisher-confirm-type: correlated  #确认消息已发送到交换机(Exchange)
+    publisher-returns: true #确认消息
 #Mysql
   datasource:
     driver-class-name: com.mysql.jdbc.Driver

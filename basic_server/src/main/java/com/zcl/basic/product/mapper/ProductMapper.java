@@ -5,6 +5,7 @@ import com.zcl.basic.product.model.Product;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -20,4 +21,11 @@ public interface ProductMapper extends BaseMapper<Product> {
      * @param flagValue
      */
     void batchUpdateProductStatus(@Param("productIds") List<String> productIds,@Param("flagValue") String flagValue);
+
+    /**
+     * 根据商品ID更新库存
+     * @param productId
+     * @param stock
+     */
+    void updateProductStockById(@Param("productId") String productId,@Param("stock") BigDecimal stock);
 }

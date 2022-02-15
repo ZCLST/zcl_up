@@ -7,6 +7,7 @@ import com.zcl.basic.product.request.ProductSaveRequest;
 import com.zcl.basic.product.service.ProductService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,6 +61,11 @@ public class ProductServiceImpl implements ProductService {
         QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(Product.PRODUCT_CODE,productCode);
         return productMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public void updateProductStockById(String productId, BigDecimal stock) {
+        productMapper.updateProductStockById(productId,stock);
     }
 
 

@@ -8,4 +8,8 @@
             #{id}
         </foreach>
     </update>
+    <update id="updateProductStockById">
+        update t_product set stock=#{stock}
+        where product_id = #{productId}
+    </update>
 </mapper>

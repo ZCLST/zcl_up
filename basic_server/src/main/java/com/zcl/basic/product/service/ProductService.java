@@ -4,6 +4,7 @@ import com.zcl.basic.product.model.Product;
 import com.zcl.basic.product.request.ProductSaveRequest;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -61,4 +62,11 @@ public interface ProductService {
      * @return
      */
     Product findProductByCode(String productCode);
+
+    /**
+     * 根据商品ID更新库存
+     * @param productId
+     * @param stock
+     */
+    void updateProductStockById(String productId, BigDecimal stock);
 }

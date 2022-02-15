@@ -131,9 +131,9 @@ public class ProductBizImpl implements ProductBiz {
             productRequest.setProductUrl(OssUtil.GLOBAL_IMG_URL);
         }
         //存入数据库
-        this.saveProduct(productRequest, uuid);
-        //添加缓存队列
-//        this.buildProductInfoRedisQueue(uuid);
+        Product newProduct = this.saveProduct(productRequest, uuid);
+        //存入redis
+        this.saveProductRedis(newProduct);
         //存入ES
         this.saveProductIndex(productRequest, uuid);
         return CommonResponse.setResponseData(null);
@@ -153,12 +153,17 @@ public class ProductBizImpl implements ProductBiz {
             }
         }
         //更新数据库数据
-        this.updateProductDb(product, productUpdateRequest);
-        //添加缓存队列
-//        this.buildProductInfoRedisQueue(product.getProductId());
+        Product newProduct = this.updateProductDb(product, productUpdateRequest);
+        //存入redis
+        this.saveProductRedis(newProduct);
         //更新ES
         this.updateProductIndex(product, productUpdateRequest);
         return CommonResponse.setResponseData(null);
+    }
+
+    private void saveProductRedis(Product newProduct) {
+        String key = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, newProduct.getProductId());
+        JedisUtil.getJedis().set(key,JSON.toJSONString(newProduct));
     }
 
     @Override
@@ -181,11 +186,18 @@ public class ProductBizImpl implements ProductBiz {
         }
         //更新数据库数据
         this.batchUpdateProductStatusDb(oldIdList, flagValue);
-        //批量添加缓存队列
-//        this.buildBatchProductInfoRedisQueue(oldIdList);
+        //批量存入redis
+        this.saveBatchRedis(products);
         //更新ES
         this.batchUpdateProductIndexStatus(products, flagValue);
         return CommonResponse.setResponseData(null);
+    }
+
+    private void saveBatchRedis(List<Product> products) {
+        products.stream().forEach(product -> {
+            String key = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, product.getProductId());
+            JedisUtil.getJedis().set(key,JSON.toJSONString(product));
+        });
     }
 
     private void buildBatchProductInfoRedisQueue(List<String> oldIdList) {
@@ -213,7 +225,7 @@ public class ProductBizImpl implements ProductBiz {
         List<ProductVo> productVos = BeanUtil.convertList(product.getContent(), ProductVo.class);
         if (CollectionUtils.isNotEmpty(productVos)) {
             //计算库存
-            this.handleStock(productVos, selectPageProductRequest.getHaveStock());
+//            this.handleStock(productVos, selectPageProductRequest.getHaveStock());
             //计算金额
             this.handleMoney(productVos);
             int totalElements = (int) product.getTotalElements();
@@ -380,19 +392,21 @@ public class ProductBizImpl implements ProductBiz {
         productIndexService.saveProductIndex(productIndex);
     }
 
-    private void updateProductDb(Product product, ProductUpdateRequest productUpdateRequest) {
+    private Product updateProductDb(Product product, ProductUpdateRequest productUpdateRequest) {
         Product convert = BeanUtil.convert(productUpdateRequest, Product.class);
         convert.setCreateTime(product.getCreateTime());
         productService.updateProduct(convert);
+        return convert;
     }
 
-    private void saveProduct(ProductSaveRequest productRequest, String uuid) {
+    private Product saveProduct(ProductSaveRequest productRequest, String uuid) {
         String nowTime = DateUtils.getNowTime();
         Date date = DateUtils.dateReturnFormat(nowTime);
         Product product = BeanUtil.convert(productRequest, Product.class);
         product.setCreateTime(date);
         product.setProductId(uuid);
         productService.saveProduct(product);
+        return product;
     }
 
     private void buildProductInfoRedisQueue(String productId) {

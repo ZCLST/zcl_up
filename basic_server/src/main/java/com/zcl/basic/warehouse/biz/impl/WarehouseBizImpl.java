@@ -3,6 +3,7 @@ package com.zcl.basic.warehouse.biz.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zcl.basic.log.vo.FunctionLogPageVo;
+import com.zcl.basic.product.dto.ProductStockDto;
 import com.zcl.basic.product.engine.model.ProductIndex;
 import com.zcl.basic.product.engine.service.ProductIndexService;
 import com.zcl.basic.product.service.ProductService;
@@ -22,13 +23,13 @@ import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.BeanUtil;
 import com.zcl.util.general.util.DateUtils;
 import com.zcl.util.general.util.MyBigDecimalUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zcl
@@ -86,8 +87,10 @@ public class WarehouseBizImpl implements WarehouseBiz {
         ProductWarehouseRel productWarehouseRel = productWarehouseRelService.findProductWarehouseRelById(productWarehouseId);
         Assert.notNull(productWarehouseRel, "该关系不存在！");
         productWarehouseRel.setStock(stock);
-        //更新数据库库存
+        //更新数据库库存关系
         productWarehouseRelService.updateProductWarehouseRel(productWarehouseRel);
+        //更新商品表库存
+        this.changeDbProductStock(productWarehouseRel.getProductId());
         //更新ES
         ProductIndex productIndex=productIndexService.findProductIndexById(productWarehouseRel.getProductId());
         if(productIndex!=null){
@@ -98,12 +101,28 @@ public class WarehouseBizImpl implements WarehouseBiz {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> changeProductWarehouseBindRel(ChangeProductWarehouseBindRelRequest changeProductWarehouseBindRelRequest) {
         String productWarehouseId = changeProductWarehouseBindRelRequest.getProductWarehouseId();
         String status = changeProductWarehouseBindRelRequest.getStatus();
         ProductWarehouseRel productWarehouseRelById = productWarehouseRelService.findProductWarehouseRelById(productWarehouseId);
         productWarehouseRelById.setStatus(status);
         productWarehouseRelService.updateProductWarehouseRel(productWarehouseRelById);
+        //更新商品表库存
+        this.changeDbProductStock(productWarehouseRelById.getProductId());
         return CommonResponse.setResponseData(null);
+    }
+
+    private void changeDbProductStock(String productId) {
+        BigDecimal bigDecimal = new BigDecimal("0");
+        //计算商品总库存
+        List<String> id = new ArrayList<>();
+        id.add(productId);
+        List<ProductStockDto> productStockDtoList = warehouseService.selectStock(id);
+        if(CollectionUtils.isNotEmpty(productStockDtoList)){
+            bigDecimal=productStockDtoList.get(0).getStock();
+        }
+        //更新数据库库存
+        productService.updateProductStockById(productId,bigDecimal);
     }
 }
