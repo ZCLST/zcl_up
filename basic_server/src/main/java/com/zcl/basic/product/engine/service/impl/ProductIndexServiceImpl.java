@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author zcl
@@ -64,6 +65,15 @@ public class ProductIndexServiceImpl implements ProductIndexService {
         return search;
     }
 
+    @Override
+    public ProductIndex findProductIndexById(String productId) {
+        Optional<ProductIndex> productIndex = productIndexRepository.findById(productId);
+        if (productIndex.isPresent()) {
+            return productIndex.get();
+        }
+        return null;
+    }
+
     private PageRequest setPageAndOrder(SelectPageProductRequest selectPageProductRequest) {
         List<Sort.Order> orders = new ArrayList<>();
         Sort.Order orderName = new Sort.Order(Sort.Direction.ASC, ProductIndex.PRODUCT_NAME);
@@ -72,7 +82,11 @@ public class ProductIndexServiceImpl implements ProductIndexService {
         orders.add(orderName);
         orders.add(orderCreateTime);
         Sort sort = Sort.by(orders);
-        PageRequest pageRequest = PageRequest.of(selectPageProductRequest.getPageNum(), selectPageProductRequest.getPageSize(), sort);
+        Integer pageIndex = selectPageProductRequest.getPageIndex();
+        if (pageIndex > 0) {
+            pageIndex = pageIndex - 1;
+        }
+        PageRequest pageRequest = PageRequest.of(pageIndex, selectPageProductRequest.getPageSize(), sort);
         return pageRequest;
     }
 
@@ -86,13 +100,13 @@ public class ProductIndexServiceImpl implements ProductIndexService {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ProductIndex.PRODUCT_NAME, "*" + selectPageProductRequest.getProductName() + "*"));
         }
         //有无库存
-//        if (StringUtils.isNotBlank(selectPageProductRequest.getHaveStock())) {
-//            if (StringUtils.equals(StatusEnum.YES.getFlag(), selectPageProductRequest.getHaveStock())) {
-//                boolQueryBuilder.must(QueryBuilders.rangeQuery(ProductIndex.STOCK).gt(0L));
-//            } else {
-//                boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STOCK, 0L));
-//            }
-//        }
+        if (StringUtils.isNotBlank(selectPageProductRequest.getHaveStock())) {
+            if (StringUtils.equals(StatusEnum.YES.getFlag(), selectPageProductRequest.getHaveStock())) {
+                boolQueryBuilder.must(QueryBuilders.rangeQuery(ProductIndex.STOCK).gt(0L));
+            } else {
+                boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STOCK, 0L));
+            }
+        }
         //是否启用
         if (StringUtils.isNotBlank(selectPageProductRequest.getStatus())) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STATUS, selectPageProductRequest.getStatus()));
@@ -101,7 +115,7 @@ public class ProductIndexServiceImpl implements ProductIndexService {
 
     private void setQuery(BoolQueryBuilder boolQueryBuilder, SelectPageProductRequest selectPageProductRequest) {
         //只展示启用商品
-            boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STATUS,StatusEnum.YES.getFlag()));
+        boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STATUS, StatusEnum.YES.getFlag()));
         //商品编码
         if (StringUtils.isNotBlank(selectPageProductRequest.getProductCode())) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.PRODUCT_CODE, selectPageProductRequest.getProductCode()));
@@ -111,13 +125,13 @@ public class ProductIndexServiceImpl implements ProductIndexService {
             boolQueryBuilder.must(QueryBuilders.wildcardQuery(ProductIndex.PRODUCT_NAME, "*" + selectPageProductRequest.getProductName() + "*"));
         }
         //有无库存
-//        if (StringUtils.isNotBlank(selectPageProductRequest.getHaveStock())) {
-//            if (StringUtils.equals(StatusEnum.YES.getFlag(), selectPageProductRequest.getHaveStock())) {
-//                boolQueryBuilder.must(QueryBuilders.rangeQuery(ProductIndex.STOCK).gt(0L));
-//            } else {
-//                boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STOCK, 0L));
-//            }
-//        }
+        if (StringUtils.isNotBlank(selectPageProductRequest.getHaveStock())) {
+            if (StringUtils.equals(StatusEnum.YES.getFlag(), selectPageProductRequest.getHaveStock())) {
+                boolQueryBuilder.must(QueryBuilders.rangeQuery(ProductIndex.STOCK).gt(0L));
+            } else {
+                boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STOCK, 0L));
+            }
+        }
         //是否启用
         if (StringUtils.isNotBlank(selectPageProductRequest.getStatus())) {
             boolQueryBuilder.must(QueryBuilders.termQuery(ProductIndex.STATUS, selectPageProductRequest.getStatus()));

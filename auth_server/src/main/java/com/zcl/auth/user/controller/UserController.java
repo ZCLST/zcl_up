@@ -52,7 +52,6 @@ public class UserController {
      * @param userPageRequest
      * @return
      */
-    @PointLog(id = "9", value = "用户管理")
     @PostMapping("/listUser.json")
     public Map<String, Object> listUser(@RequestBody UserPageRequest userPageRequest) {
         return userBiz.listUser(userPageRequest);

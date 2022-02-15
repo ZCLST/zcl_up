@@ -3,6 +3,8 @@ package com.zcl.basic.warehouse.biz.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zcl.basic.log.vo.FunctionLogPageVo;
+import com.zcl.basic.product.engine.model.ProductIndex;
+import com.zcl.basic.product.engine.service.ProductIndexService;
 import com.zcl.basic.product.service.ProductService;
 import com.zcl.basic.warehouse.biz.WarehouseBiz;
 import com.zcl.basic.warehouse.model.ProductWarehouseRel;
@@ -19,7 +21,9 @@ import com.zcl.util.general.enums.SysCodeEnum;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.BeanUtil;
 import com.zcl.util.general.util.DateUtils;
+import com.zcl.util.general.util.MyBigDecimalUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
@@ -36,17 +40,19 @@ public class WarehouseBizImpl implements WarehouseBiz {
     private WarehouseService warehouseService;
     private ProductService productService;
     private ProductWarehouseRelService productWarehouseRelService;
+    private ProductIndexService productIndexService;
 
-    public WarehouseBizImpl(WarehouseService warehouseService, ProductService productService, ProductWarehouseRelService productWarehouseRelService) {
+    public WarehouseBizImpl(WarehouseService warehouseService, ProductService productService, ProductWarehouseRelService productWarehouseRelService, ProductIndexService productIndexService) {
         this.warehouseService = warehouseService;
         this.productService = productService;
         this.productWarehouseRelService = productWarehouseRelService;
+        this.productIndexService = productIndexService;
     }
 
     @Override
     public Map<String, Object> selectPageWarehouse(SelectPageWarehouseRequest selectPageWarehouseRequest) {
         //加工请求体
-        IPage<SelectPageWarehouseVo> warehousePage = new Page<>(selectPageWarehouseRequest.getPageNum(), selectPageWarehouseRequest.getPageSize());
+        IPage<SelectPageWarehouseVo> warehousePage = new Page<>(selectPageWarehouseRequest.getPageIndex(), selectPageWarehouseRequest.getPageSize());
         IPage<SelectPageWarehouseVo> wareHouseIPage = warehouseService.selectPageWarehouse(warehousePage, selectPageWarehouseRequest.getWarehouseCode(), selectPageWarehouseRequest.getProductId());
         return CommonResponse.setResponseData(wareHouseIPage);
     }
@@ -54,7 +60,7 @@ public class WarehouseBizImpl implements WarehouseBiz {
     @Override
     public Map<String, Object> selectPageBindWarehouse(SelectPageWarehouseRequest selectPageWarehouseRequest) {
         //加工请求体
-        IPage<SelectPageWarehouseVo> warehousePage = new Page<>(selectPageWarehouseRequest.getPageNum(), selectPageWarehouseRequest.getPageSize());
+        IPage<SelectPageWarehouseVo> warehousePage = new Page<>(selectPageWarehouseRequest.getPageIndex(), selectPageWarehouseRequest.getPageSize());
         IPage<SelectPageWarehouseVo> wareHouseIPage = warehouseService.selectPageBindWarehouse(warehousePage, selectPageWarehouseRequest.getWarehouseCode(), selectPageWarehouseRequest.getProductId());
         return CommonResponse.setResponseData(wareHouseIPage);
     }
@@ -72,6 +78,7 @@ public class WarehouseBizImpl implements WarehouseBiz {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> updateProductWarehouseStock(UpdateProductWarehouseStockRequest updateProductWarehouseStockRequest) {
         String productWarehouseId = updateProductWarehouseStockRequest.getProductWarehouseId();
         BigDecimal stock = updateProductWarehouseStockRequest.getStock();
@@ -81,6 +88,12 @@ public class WarehouseBizImpl implements WarehouseBiz {
         productWarehouseRel.setStock(stock);
         //更新数据库库存
         productWarehouseRelService.updateProductWarehouseRel(productWarehouseRel);
+        //更新ES
+        ProductIndex productIndex=productIndexService.findProductIndexById(productWarehouseRel.getProductId());
+        if(productIndex!=null){
+            productIndex.setStock(MyBigDecimalUtil.multiply(stock));
+            productIndexService.saveProductIndex(productIndex);
+        }
         return CommonResponse.setResponseData(null);
     }
 

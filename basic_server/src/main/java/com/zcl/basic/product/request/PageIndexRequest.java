@@ -1,5 +1,6 @@
 package com.zcl.basic.product.request;
 
+import lombok.Data;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import javax.validation.constraints.NotNull;
  * @desc    索引分页泛型
 
  **/
+@Data
 public abstract class PageIndexRequest {
 
     /**
@@ -28,29 +30,9 @@ public abstract class PageIndexRequest {
     /**
      * 页码
      */
-    @NotNull(message = "pageNum不能为空")
-    private Integer pageNum;
+    @NotNull(message = "pageIndex不能为空")
+    private Integer pageIndex;
 
 
-    public Pageable toPageable() {
-        int pageNum = this.getPageNum() > 0 ? this.getPageNum() - 1 : 0;
-        int pageSize = this.getPageSize();
-        return PageRequest.of(pageNum, pageSize);
-    }
 
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public int getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
-    }
 }

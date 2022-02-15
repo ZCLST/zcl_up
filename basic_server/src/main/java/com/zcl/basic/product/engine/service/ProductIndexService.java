@@ -41,4 +41,11 @@ public interface ProductIndexService {
      * @return
      */
     Page<ProductIndex> selectPageProductShop(SelectPageProductRequest selectPageProductRequest);
+
+    /**
+     * 根据productId查询商品
+     * @param productId
+     * @return
+     */
+    ProductIndex findProductIndexById(String productId);
 }

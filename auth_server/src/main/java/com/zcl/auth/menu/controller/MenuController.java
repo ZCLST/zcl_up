@@ -44,7 +44,6 @@ public class MenuController {
      * 菜单管理获取所有菜单
      * @return
      */
-    @PointLog(id = "10", value = "菜单管理")
     @GetMapping(value = "/selectAllMenus.json")
     public Map<String, Object> selectAllMenus() {
         return menuBiz.selectAllMenus();

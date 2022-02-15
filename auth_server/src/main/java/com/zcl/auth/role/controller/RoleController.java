@@ -46,7 +46,6 @@ public class RoleController {
      * @param rolePageRequest
      * @return
      */
-    @PointLog(id = "8", value = "角色管理")
     @PostMapping("/selectPageRoles.json")
     public Map<String, Object> selectPageRoles(@RequestBody RolePageRequest rolePageRequest) {
         return roleBiz.selectPageRoles(rolePageRequest);
