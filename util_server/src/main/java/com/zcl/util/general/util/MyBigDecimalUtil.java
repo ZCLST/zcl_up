@@ -34,6 +34,9 @@ public class MyBigDecimalUtil {
      * @return
      */
     public static Long multiply(BigDecimal obj) {
+        if(obj==null){
+            return 0L;
+        }
         Long result =obj.multiply(BigDecimal.valueOf(MAGNIFICATION)).longValue();
         return result;
     }

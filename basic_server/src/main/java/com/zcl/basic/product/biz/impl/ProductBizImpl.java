@@ -1,6 +1,7 @@
 package com.zcl.basic.product.biz.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.zcl.basic.config.RabbitMqConfig;
 import com.zcl.basic.feign.user.client.UserFeignClient;
 import com.zcl.basic.product.biz.ProductBiz;
 import com.zcl.basic.product.dto.CartDto;
@@ -26,6 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +50,15 @@ public class ProductBizImpl implements ProductBiz {
     private WarehouseService warehouseService;
     private RedisQueueService redisQueueService;
     private UserFeignClient userFeignClient;
+    private RabbitTemplate rabbitTemplate;
 
-    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService, RedisQueueService redisQueueService, UserFeignClient userFeignClient) {
+    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService, RedisQueueService redisQueueService, UserFeignClient userFeignClient, RabbitTemplate rabbitTemplate) {
         this.productService = productService;
         this.productIndexService = productIndexService;
         this.warehouseService = warehouseService;
         this.redisQueueService = redisQueueService;
         this.userFeignClient = userFeignClient;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
@@ -132,10 +136,12 @@ public class ProductBizImpl implements ProductBiz {
         }
         //存入数据库
         Product newProduct = this.saveProduct(productRequest, uuid);
-        //存入redis
-        this.saveProductRedis(newProduct);
-        //存入ES
-        this.saveProductIndex(productRequest, uuid);
+        byte[] bytes = JSON.toJSONString(newProduct).getBytes();
+        rabbitTemplate.convertAndSend(RabbitMqConfig.PRODUCT_EXCHANGE_NAME, RabbitMqConfig.PRODUCT_SAVE_ROUTING_KEY, bytes);
+        //        //存入redis
+//        this.saveProductRedis(newProduct);
+//        //存入ES
+//        this.saveProductIndex(productRequest, uuid);
         return CommonResponse.setResponseData(null);
     }
 
@@ -274,6 +280,43 @@ public class ProductBizImpl implements ProductBiz {
         }
     }
 
+    @Override
+    public void saveProductToEsAndRedis(Product product) {
+        //计算库存
+        this.handleProductStock(product);
+        //计算索引的库存和金额
+        ProductIndex productIndex=this.handleIndexProductStockAndMoney(product);
+        //更新缓存
+        String key = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, product.getProductId());
+        JedisUtil.getJedis().set(key,JSON.toJSONString(product));
+        //更新索引
+        productIndexService.saveProductIndex(productIndex);
+    }
+
+    @Override
+    public void saveTtlProductToEsAndRedis(String productId) {
+        Product productById = productService.findProductById(productId);
+        this.saveProductToEsAndRedis(productById);
+    }
+
+    private ProductIndex handleIndexProductStockAndMoney(Product product) {
+        Long money = MyBigDecimalUtil.multiply(product.getStock());
+        Long stock = MyBigDecimalUtil.multiply(product.getProductMoney());
+        ProductIndex productIndex = BeanUtil.convert(product, ProductIndex.class,Product.STOCK,Product.PRODUCT_MONEY);
+        productIndex.setStock(stock);
+        productIndex.setProductMoney(money);
+        return productIndex;
+    }
+
+    private void handleProductStock(Product product) {
+        List<String> id = new ArrayList<>();
+        id.add(product.getProductId());
+        List<ProductStockDto> productStockDtoList = warehouseService.selectStock(id);
+        if(CollectionUtils.isNotEmpty(productStockDtoList)){
+            ProductStockDto productStockDto = productStockDtoList.get(0);
+            product.setStock(productStockDto.getStock());
+        }
+    }
     private void handleQuery(CartVo cartVo,ShowCartRequest showCartRequest) {
         if(StringUtils.isNotBlank(showCartRequest.getProductCodeOrName())){
 

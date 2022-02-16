@@ -64,7 +64,7 @@ public class RabbitMqConfig {
         //设置超时时间 2分钟，整个队列过期
         //params.put( "x-expires",1000*60*2);
         // 队列中的消息未被消费则2分钟后过期
-        params.put("x-message-ttl", 1000 * 60 * 2);
+        params.put("x-message-ttl", 1000 * 60 * 1);
         return new Queue(PRODUCT_TTL_QUEUE, true, false, false, params);
     }
     //商品死信队列持久化

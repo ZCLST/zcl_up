@@ -1,5 +1,6 @@
 package com.zcl.basic.product.biz;
 
+import com.zcl.basic.product.model.Product;
 import com.zcl.basic.product.request.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -75,4 +76,16 @@ public interface ProductBiz {
      * @return
      */
     Map<String, Object> showCart(@Valid ShowCartRequest showCartRequest);
+
+    /**
+     * 保存商品至redis、es（消费者）手动确认
+     * @param product
+     */
+    void saveProductToEsAndRedis(Product product);
+
+    /**
+     * 保存商品至redis、es（监听死信队列（TTL+死信队列=消息延迟））手动确认
+     * @param productId
+     */
+    void saveTtlProductToEsAndRedis(String productId);
 }
