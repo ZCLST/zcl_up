@@ -1,7 +1,6 @@
 package com.zcl.basic.product.biz.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.zcl.basic.config.RabbitMqConfig;
 import com.zcl.basic.feign.user.client.UserFeignClient;
 import com.zcl.basic.product.biz.ProductBiz;
 import com.zcl.basic.product.dto.CartDto;
@@ -15,18 +14,13 @@ import com.zcl.basic.product.service.ProductService;
 import com.zcl.basic.product.vo.CartItemVo;
 import com.zcl.basic.product.vo.CartVo;
 import com.zcl.basic.product.vo.ProductVo;
-import com.zcl.basic.redisqueue.model.RedisQueue;
-import com.zcl.basic.redisqueue.service.RedisQueueService;
 import com.zcl.basic.warehouse.service.WarehouseService;
-import com.zcl.util.general.enums.ActionTypeEnum;
 import com.zcl.util.general.enums.StatusEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -37,6 +31,7 @@ import redis.clients.jedis.Jedis;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author zcl
@@ -48,15 +43,13 @@ public class ProductBizImpl implements ProductBiz {
     private ProductService productService;
     private ProductIndexService productIndexService;
     private WarehouseService warehouseService;
-    private RedisQueueService redisQueueService;
     private UserFeignClient userFeignClient;
     private RabbitTemplate rabbitTemplate;
 
-    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService, RedisQueueService redisQueueService, UserFeignClient userFeignClient, RabbitTemplate rabbitTemplate) {
+    public ProductBizImpl(ProductService productService, ProductIndexService productIndexService, WarehouseService warehouseService, UserFeignClient userFeignClient, RabbitTemplate rabbitTemplate) {
         this.productService = productService;
         this.productIndexService = productIndexService;
         this.warehouseService = warehouseService;
-        this.redisQueueService = redisQueueService;
         this.userFeignClient = userFeignClient;
         this.rabbitTemplate = rabbitTemplate;
     }
@@ -67,13 +60,22 @@ public class ProductBizImpl implements ProductBiz {
         List<ProductVo> productVos = BeanUtil.convertList(product.getContent(), ProductVo.class);
         if (CollectionUtils.isNotEmpty(productVos)) {
             //计算库存
-            this.handleStock(productVos, selectPageProductRequest.getHaveStock());
+            this.handleStock(productVos);
             //计算金额
             this.handleMoney(productVos);
             int totalElements = (int) product.getTotalElements();
-            return CommonResponse.setIndexPageResponse(productVos,totalElements);
+            return CommonResponse.setIndexPageResponse(productVos, totalElements);
         }
+
         return CommonResponse.setIndexPageResponse(null, null);
+    }
+
+    private void handleStock(List<ProductVo> productVos) {
+        //库存取出除1W
+        productVos.stream().forEach(productVo -> {
+            BigDecimal stock = MyBigDecimalUtil.divide(productVo.getStock());
+            productVo.setRealStock(stock);
+        });
     }
 
     private void handleMoney(List<ProductVo> productVos) {
@@ -84,43 +86,6 @@ public class ProductBizImpl implements ProductBiz {
         });
     }
 
-    private void handleStock(List<ProductVo> productVos, String haveStock) {
-        //查询商品库存，结果为空商品库存置为0
-        Map<String, ProductStockDto> map = new HashMap<>();
-        List<String> productIds = productVos.stream().map(productVo -> productVo.getProductId()).collect(Collectors.toList());
-        List<ProductStockDto> productStockDtoList = warehouseService.selectStock(productIds);
-        if (CollectionUtils.isNotEmpty(productStockDtoList)) {
-            productStockDtoList.stream().forEach(productStockDto -> {
-                map.put(productStockDto.getProductId(), productStockDto);
-            });
-        }
-        productVos.stream().forEach(productVo -> {
-            if (map.containsKey(productVo.getProductId())) {
-                productVo.setRealStock(map.get(productVo.getProductId()).getStock());
-            } else {
-                productVo.setRealStock(new BigDecimal("0"));
-            }
-        });
-        //有无库存查询
-        if (StringUtils.isNotBlank(haveStock)) {
-            //有库存
-            if (StringUtils.equals(haveStock, StatusEnum.YES.getFlag())) {
-                BigDecimal bigDecimal = new BigDecimal("0.00");
-                List<ProductVo> collect = productVos.stream()
-                        .filter(productVo -> productVo.getRealStock().compareTo(bigDecimal) == 1)
-                        .collect(Collectors.toList());
-                productVos.clear();
-                productVos.addAll(collect);
-            } else {
-                BigDecimal bigDecimal = new BigDecimal("0.00");
-                List<ProductVo> collect = productVos.stream()
-                        .filter(productVo -> productVo.getRealStock().compareTo(bigDecimal) < 1)
-                        .collect(Collectors.toList());
-                productVos.clear();
-                productVos.addAll(collect);
-            }
-        }
-    }
 
     @Override
     @Transactional
@@ -136,12 +101,7 @@ public class ProductBizImpl implements ProductBiz {
         }
         //存入数据库
         Product newProduct = this.saveProduct(productRequest, uuid);
-        byte[] bytes = JSON.toJSONString(newProduct).getBytes();
-        rabbitTemplate.convertAndSend(RabbitMqConfig.PRODUCT_EXCHANGE_NAME, RabbitMqConfig.PRODUCT_SAVE_ROUTING_KEY, bytes);
-        //        //存入redis
-//        this.saveProductRedis(newProduct);
-//        //存入ES
-//        this.saveProductIndex(productRequest, uuid);
+        this.saveProductToRedisAndEs(newProduct);
         return CommonResponse.setResponseData(null);
     }
 
@@ -160,17 +120,11 @@ public class ProductBizImpl implements ProductBiz {
         }
         //更新数据库数据
         Product newProduct = this.updateProductDb(product, productUpdateRequest);
-        //存入redis
-        this.saveProductRedis(newProduct);
-        //更新ES
-        this.updateProductIndex(product, productUpdateRequest);
+        //存入缓存以及es
+        this.saveProductToRedisAndEs(newProduct);
         return CommonResponse.setResponseData(null);
     }
 
-    private void saveProductRedis(Product newProduct) {
-        String key = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, newProduct.getProductId());
-        JedisUtil.getJedis().set(key,JSON.toJSONString(newProduct));
-    }
 
     @Override
     @Transactional
@@ -192,31 +146,10 @@ public class ProductBizImpl implements ProductBiz {
         }
         //更新数据库数据
         this.batchUpdateProductStatusDb(oldIdList, flagValue);
-        //批量存入redis
-        this.saveBatchRedis(products);
-        //更新ES
-        this.batchUpdateProductIndexStatus(products, flagValue);
+        //批量存入缓存以及ES
+        this.saveBatchProductToRedisAndEs(products);
         return CommonResponse.setResponseData(null);
     }
-
-    private void saveBatchRedis(List<Product> products) {
-        products.stream().forEach(product -> {
-            String key = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, product.getProductId());
-            JedisUtil.getJedis().set(key,JSON.toJSONString(product));
-        });
-    }
-
-    private void buildBatchProductInfoRedisQueue(List<String> oldIdList) {
-        List<RedisQueue> redisQueues = new ArrayList<>();
-        oldIdList.stream().forEach(id -> {
-            RedisQueue redisQueue = new RedisQueue();
-            redisQueue.setEntityId(id);
-            redisQueue.setActionType(ActionTypeEnum.PRODUCT_ACTION.getCode());
-            redisQueues.add(redisQueue);
-        });
-        redisQueueService.saveBatch(redisQueues);
-    }
-
 
     @Override
     public Map<String, Object> findProductById(String id) {
@@ -231,11 +164,11 @@ public class ProductBizImpl implements ProductBiz {
         List<ProductVo> productVos = BeanUtil.convertList(product.getContent(), ProductVo.class);
         if (CollectionUtils.isNotEmpty(productVos)) {
             //计算库存
-//            this.handleStock(productVos, selectPageProductRequest.getHaveStock());
+            this.handleStock(productVos);
             //计算金额
             this.handleMoney(productVos);
             int totalElements = (int) product.getTotalElements();
-            return CommonResponse.setIndexPageResponse(productVos,totalElements);
+            return CommonResponse.setIndexPageResponse(productVos, totalElements);
         }
         return CommonResponse.setIndexPageResponse(null, null);
     }
@@ -259,24 +192,39 @@ public class ProductBizImpl implements ProductBiz {
             //创建购物车
             this.buildCart(jedis, key, addCartRequest);
         }
+        //关闭连接
+        jedis.close();
         return CommonResponse.setResponseData(null);
     }
 
     @Override
-    public Map<String, Object> showCart(ShowCartRequest showCartRequest) {
-        Object userByUid = userFeignClient.findUserByUid(showCartRequest.getUserId());
-        Assert.notNull(userByUid, "该用户不存在!");
-        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, showCartRequest.getUserId());
+    public Map<String, Object> showCart(String productCodeOrName) {
+        String userId = ContextUtils.getUserId();
+        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, userId);
         Jedis jedis = JedisUtil.getJedis();
         if (jedis.exists(key)) {
             String str = jedis.get(key);
             //构建cartVo
-            CartVo cartVo = this.buildCartVo(jedis,str);
-            //查询条件不为空,加工VO
-            this.handleQuery(cartVo,showCartRequest);
+            CartVo cartVo = this.buildCartVo(jedis, str);
+            //根据查询条件,加工VO
+            this.handleQuery(cartVo, productCodeOrName);
+            //关闭连接
+            jedis.close();
             return CommonResponse.setResponseData(cartVo);
         } else {
+            //关闭连接
+            jedis.close();
             return CommonResponse.setResponseData(null);
+        }
+    }
+
+    private void handleQuery(CartVo cartVo, String productCodeOrName) {
+        if (StringUtils.isNotBlank(productCodeOrName)) {
+            List<CartItemVo> cartItemVos = cartVo.getCartItemVos();
+            List<CartItemVo> collect = cartItemVos.stream().filter(cartItemVo ->
+                    cartItemVo.getProductName().contains(productCodeOrName) || cartItemVo.getProductCode().contains(productCodeOrName))
+                    .collect(Collectors.toList());
+            cartVo.setCartItemVos(collect);
         }
     }
 
@@ -285,10 +233,10 @@ public class ProductBizImpl implements ProductBiz {
         //计算库存
         this.handleProductStock(product);
         //计算索引的库存和金额
-        ProductIndex productIndex=this.handleIndexProductStockAndMoney(product);
+        ProductIndex productIndex = this.handleIndexProductStockAndMoney(product);
         //更新缓存
         String key = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, product.getProductId());
-        JedisUtil.getJedis().set(key,JSON.toJSONString(product));
+        JedisUtil.getJedis().set(key, JSON.toJSONString(product));
         //更新索引
         productIndexService.saveProductIndex(productIndex);
     }
@@ -299,31 +247,79 @@ public class ProductBizImpl implements ProductBiz {
         this.saveProductToEsAndRedis(productById);
     }
 
-    private ProductIndex handleIndexProductStockAndMoney(Product product) {
-        Long money = MyBigDecimalUtil.multiply(product.getStock());
-        Long stock = MyBigDecimalUtil.multiply(product.getProductMoney());
-        ProductIndex productIndex = BeanUtil.convert(product, ProductIndex.class,Product.STOCK,Product.PRODUCT_MONEY);
-        productIndex.setStock(stock);
-        productIndex.setProductMoney(money);
-        return productIndex;
-    }
-
-    private void handleProductStock(Product product) {
-        List<String> id = new ArrayList<>();
-        id.add(product.getProductId());
-        List<ProductStockDto> productStockDtoList = warehouseService.selectStock(id);
-        if(CollectionUtils.isNotEmpty(productStockDtoList)){
-            ProductStockDto productStockDto = productStockDtoList.get(0);
-            product.setStock(productStockDto.getStock());
+    @Override
+    public Map<String, Object> deleteCartItem(List<String> productIds) {
+        CartDto cartDto = new CartDto();
+        Jedis jedis = JedisUtil.getJedis();
+        String userId = ContextUtils.getUserId();
+        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, userId);
+        if (jedis.exists(key)) {
+            //获取购物车
+            String json = jedis.get(key);
+            cartDto = JSON.parseObject(json, CartDto.class);
+            //删除购物车该商品购物项
+            List<CartItemDto> cartItemDtoList = cartDto.getCartItemDtoList();
+            if (CollectionUtils.isNotEmpty(cartItemDtoList)) {
+                List<CartItemDto> old_cartItemDtoList = cartItemDtoList.stream().filter(cartItemDto -> productIds.contains(cartItemDto.getProductId())).collect(Collectors.toList());
+                cartItemDtoList.removeAll(old_cartItemDtoList);
+                cartDto.setCartItemDtoList(cartItemDtoList);
+                String jsonString = JSON.toJSONString(cartDto);
+                jedis.set(key,jsonString);
+            }
         }
+        //关闭连接
+        jedis.close();
+        return CommonResponse.setResponseData(cartDto);
     }
-    private void handleQuery(CartVo cartVo,ShowCartRequest showCartRequest) {
-        if(StringUtils.isNotBlank(showCartRequest.getProductCodeOrName())){
 
+    @Override
+    public Map<String, Object> deleteAllCartItem() {
+        Jedis jedis = JedisUtil.getJedis();
+        String userId = ContextUtils.getUserId();
+        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, userId);
+        if (jedis.exists(key)) {
+            Long del = jedis.del(key);
+            if (del != 1L) {
+                throw new ZfException("删除购物车失败");
+            }
         }
+        //关闭连接
+        jedis.close();
+        return CommonResponse.setResponseData(null);
     }
 
-    private CartVo buildCartVo(Jedis jedis,String str) {
+    @Override
+    public Map<String, Object> changeCartItemNum(ChangeCartItemNumRequest changeCartItemNumRequest) {
+        Jedis jedis = JedisUtil.getJedis();
+        String userId = ContextUtils.getUserId();
+        String key = JedisUtil.buildKey(JedisUtil.CART_KEY, userId);
+        if (jedis.exists(key)) {
+            String json = jedis.get(key);
+            CartDto cartDto = JSON.parseObject(json, CartDto.class);
+            List<CartItemDto> cartItemDtoList = cartDto.getCartItemDtoList();
+            if(CollectionUtils.isNotEmpty(cartItemDtoList)){
+                cartItemDtoList.stream().forEach(cartItemVo -> {
+                    if (StringUtils.equals(cartItemVo.getProductId(), changeCartItemNumRequest.getProductId())) {
+                        cartItemVo.setNum(changeCartItemNumRequest.getNum());
+                    }
+                });
+                String jsonString = JSON.toJSONString(cartDto);
+                jedis.set(key, jsonString);
+            }
+        }
+        //关闭连接
+        jedis.close();
+        return CommonResponse.setResponseData(null);
+    }
+
+    private void saveBatchProductToRedisAndEs(List<Product> products) {
+        products.stream().forEach(product -> {
+            this.saveProductToRedisAndEs(product);
+        });
+    }
+
+
+    private CartVo buildCartVo(Jedis jedis, String str) {
         CartVo cartVo = new CartVo();
         List<CartItemVo> cartItemVos = new ArrayList<>();
         CartDto cartDto = JSON.parseObject(str, CartDto.class);
@@ -346,7 +342,7 @@ public class ProductBizImpl implements ProductBiz {
         CartDto cartDto = new CartDto();
         this.addCartItem(cartDto, addCartRequest.getProductId(), 1);
         Product product = productService.findProductById(addCartRequest.getProductId());
-        Assert.notNull(product,"该商品不存在");
+        Assert.notNull(product, "该商品不存在");
         String jsonString = JSON.toJSONString(cartDto);
         jedis.set(key, jsonString);
         String productInfoKey = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, addCartRequest.getProductId());
@@ -398,23 +394,6 @@ public class ProductBizImpl implements ProductBiz {
         }
     }
 
-    private void batchUpdateProductIndexStatus(List<Product> products, String flagValue) {
-        Map<String, Product> map = new HashMap<>();
-        products.stream().forEach(product -> map.put(product.getProductId(), product));
-        List<ProductIndex> productIndexList = BeanUtil.convertList(products, ProductIndex.class);
-        productIndexList.stream().forEach(productIndex -> {
-            //设置状态
-            productIndex.setStatus(flagValue);
-            //设置金额、库存，放大1w倍
-            Product product = map.get(productIndex.getProductId());
-            Long money = MyBigDecimalUtil.multiply(product.getProductMoney());
-            Long stock = MyBigDecimalUtil.multiply(product.getStock());
-            productIndex.setProductMoney(money);
-            productIndex.setStock(stock);
-        });
-
-        productIndexService.batchSaveProductIndex(productIndexList);
-    }
 
     private void batchUpdateProductStatusDb(List<String> productIds, String flagValue) {
         productService.batchUpdateProductStatus(productIds, flagValue);
@@ -424,16 +403,6 @@ public class ProductBizImpl implements ProductBiz {
         return (flag) ? StatusEnum.YES.getFlag() : StatusEnum.NO.getFlag();
     }
 
-    private void updateProductIndex(Product product, ProductUpdateRequest productUpdateRequest) {
-        ProductIndex productIndex = BeanUtil.convert(productUpdateRequest, ProductIndex.class);
-        productIndex.setCreateTime(product.getCreateTime());
-        //设置金额、库存，放大1w倍
-        Long money = MyBigDecimalUtil.multiply(productUpdateRequest.getProductMoney());
-        Long stock = MyBigDecimalUtil.multiply(product.getStock());
-        productIndex.setProductMoney(money);
-        productIndex.setStock(stock);
-        productIndexService.saveProductIndex(productIndex);
-    }
 
     private Product updateProductDb(Product product, ProductUpdateRequest productUpdateRequest) {
         Product convert = BeanUtil.convert(productUpdateRequest, Product.class);
@@ -452,25 +421,36 @@ public class ProductBizImpl implements ProductBiz {
         return product;
     }
 
-    private void buildProductInfoRedisQueue(String productId) {
-        RedisQueue redisQueue = new RedisQueue();
-        redisQueue.setEntityId(productId);
-        redisQueue.setActionType(ActionTypeEnum.PRODUCT_ACTION.getCode());
-        redisQueueService.save(redisQueue);
+
+    private void saveProductToRedisAndEs(Product product) {
+        //计算库存
+        this.handleProductStock(product);
+        //计算索引的库存和金额
+        ProductIndex productIndex = this.handleIndexProductStockAndMoney(product);
+        //更新缓存
+        String key = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, product.getProductId());
+        JedisUtil.getJedis().set(key, JSON.toJSONString(product));
+        //更新索引
+        productIndexService.saveProductIndex(productIndex);
     }
 
-    private void saveProductIndex(ProductSaveRequest productRequest, String uuid) {
-        String nowTime = DateUtils.getNowTime();
-        Date date = DateUtils.dateReturnFormat(nowTime);
-        ProductIndex productIndex = BeanUtil.convert(productRequest, ProductIndex.class);
-        productIndex.setCreateTime(date);
-        productIndex.setProductId(uuid);
-        //金额数量放大1W倍
-        Long productMoney = MyBigDecimalUtil.multiply(productRequest.getProductMoney());
-        productIndex.setProductMoney(productMoney);
-        //新增默认库存为0
-        productIndex.setStock(0L);
-        productIndexService.saveProductIndex(productIndex);
+    private ProductIndex handleIndexProductStockAndMoney(Product product) {
+        Long stock = MyBigDecimalUtil.multiply(product.getStock());
+        Long money = MyBigDecimalUtil.multiply(product.getProductMoney());
+        ProductIndex productIndex = BeanUtil.convert(product, ProductIndex.class, Product.STOCK, Product.PRODUCT_MONEY);
+        productIndex.setStock(stock);
+        productIndex.setProductMoney(money);
+        return productIndex;
+    }
+
+    private void handleProductStock(Product product) {
+        List<String> id = new ArrayList<>();
+        id.add(product.getProductId());
+        List<ProductStockDto> productStockDtoList = warehouseService.selectStock(id);
+        if (CollectionUtils.isNotEmpty(productStockDtoList)) {
+            ProductStockDto productStockDto = productStockDtoList.get(0);
+            product.setStock(productStockDto.getStock());
+        }
     }
 
 

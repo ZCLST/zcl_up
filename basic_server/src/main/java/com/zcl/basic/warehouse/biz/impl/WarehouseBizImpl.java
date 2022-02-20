@@ -1,11 +1,13 @@
 package com.zcl.basic.warehouse.biz.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zcl.basic.log.vo.FunctionLogPageVo;
 import com.zcl.basic.product.dto.ProductStockDto;
 import com.zcl.basic.product.engine.model.ProductIndex;
 import com.zcl.basic.product.engine.service.ProductIndexService;
+import com.zcl.basic.product.model.Product;
 import com.zcl.basic.product.service.ProductService;
 import com.zcl.basic.warehouse.biz.WarehouseBiz;
 import com.zcl.basic.warehouse.model.ProductWarehouseRel;
@@ -22,6 +24,7 @@ import com.zcl.util.general.enums.SysCodeEnum;
 import com.zcl.util.general.response.CommonResponse;
 import com.zcl.util.general.util.BeanUtil;
 import com.zcl.util.general.util.DateUtils;
+import com.zcl.util.general.util.JedisUtil;
 import com.zcl.util.general.util.MyBigDecimalUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -91,12 +94,9 @@ public class WarehouseBizImpl implements WarehouseBiz {
         productWarehouseRelService.updateProductWarehouseRel(productWarehouseRel);
         //更新商品表库存
         this.changeDbProductStock(productWarehouseRel.getProductId());
-        //更新ES
-        ProductIndex productIndex=productIndexService.findProductIndexById(productWarehouseRel.getProductId());
-        if(productIndex!=null){
-            productIndex.setStock(MyBigDecimalUtil.multiply(stock));
-            productIndexService.saveProductIndex(productIndex);
-        }
+        //更新ES\REDIS
+        Product product = productService.findProductById(productWarehouseRel.getProductId());
+        this.saveProductToRedisAndEs(product);
         return CommonResponse.setResponseData(null);
     }
 
@@ -110,6 +110,9 @@ public class WarehouseBizImpl implements WarehouseBiz {
         productWarehouseRelService.updateProductWarehouseRel(productWarehouseRelById);
         //更新商品表库存
         this.changeDbProductStock(productWarehouseRelById.getProductId());
+        //更新ES\REDIS
+        Product product = productService.findProductById(productWarehouseRelById.getProductId());
+        this.saveProductToRedisAndEs(product);
         return CommonResponse.setResponseData(null);
     }
 
@@ -124,5 +127,36 @@ public class WarehouseBizImpl implements WarehouseBiz {
         }
         //更新数据库库存
         productService.updateProductStockById(productId,bigDecimal);
+    }
+
+    private void saveProductToRedisAndEs(Product product) {
+        //计算库存
+        this.handleProductStock(product);
+        //计算索引的库存和金额
+        ProductIndex productIndex=this.handleIndexProductStockAndMoney(product);
+        //更新缓存
+        String key = JedisUtil.buildKey(JedisUtil.PRODUCT_KEY, product.getProductId());
+        JedisUtil.getJedis().set(key, JSON.toJSONString(product));
+        //更新索引
+        productIndexService.saveProductIndex(productIndex);
+    }
+
+    private ProductIndex handleIndexProductStockAndMoney(Product product) {
+        Long stock = MyBigDecimalUtil.multiply(product.getStock());
+        Long money = MyBigDecimalUtil.multiply(product.getProductMoney());
+        ProductIndex productIndex = BeanUtil.convert(product, ProductIndex.class,Product.STOCK,Product.PRODUCT_MONEY);
+        productIndex.setStock(stock);
+        productIndex.setProductMoney(money);
+        return productIndex;
+    }
+
+    private void handleProductStock(Product product) {
+        List<String> id = new ArrayList<>();
+        id.add(product.getProductId());
+        List<ProductStockDto> productStockDtoList = warehouseService.selectStock(id);
+        if(CollectionUtils.isNotEmpty(productStockDtoList)){
+            ProductStockDto productStockDto = productStockDtoList.get(0);
+            product.setStock(productStockDto.getStock());
+        }
     }
 }

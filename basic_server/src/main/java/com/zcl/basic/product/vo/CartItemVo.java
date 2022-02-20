@@ -25,7 +25,6 @@ public class CartItemVo {
     /**
      * 商品主键
      */
-    @TableId(type = IdType.UUID)
     private String productId;
     /**
      * 商品编码

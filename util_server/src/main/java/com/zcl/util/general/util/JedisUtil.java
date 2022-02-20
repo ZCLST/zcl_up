@@ -58,6 +58,16 @@ public class JedisUtil {
     }
 
     /**
+     * 关闭jedis客户端
+     * @param jedis
+     */
+    public static void close(Jedis jedis) {
+        if(jedis!=null){
+            jedis.close();
+        }
+    }
+
+    /**
      * 构建购物车key
      * @param format
      * @param args

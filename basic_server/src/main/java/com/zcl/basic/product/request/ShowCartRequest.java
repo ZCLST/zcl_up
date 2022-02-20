@@ -22,7 +22,6 @@ public class ShowCartRequest {
     /**
      * 用户ID
      */
-    @NotBlank(message = "userId不能为空")
     private String userId;
     /**
      * 商品编号或名称

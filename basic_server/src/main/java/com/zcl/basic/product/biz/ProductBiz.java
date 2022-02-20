@@ -1,5 +1,6 @@
 package com.zcl.basic.product.biz;
 
+import com.fasterxml.jackson.databind.annotation.JsonValueInstantiator;
 import com.zcl.basic.product.model.Product;
 import com.zcl.basic.product.request.*;
 import org.springframework.validation.annotation.Validated;
@@ -8,6 +9,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,10 +74,10 @@ public interface ProductBiz {
 
     /**
      * 查看购物车
-     * @param showCartRequest
+     * @param productCodeOrName
      * @return
      */
-    Map<String, Object> showCart(@Valid ShowCartRequest showCartRequest);
+    Map<String, Object> showCart(String productCodeOrName);
 
     /**
      * 保存商品至redis、es（消费者）手动确认
@@ -88,4 +90,24 @@ public interface ProductBiz {
      * @param productId
      */
     void saveTtlProductToEsAndRedis(String productId);
+
+    /**
+     * 根据商品购物车项删除
+     * @param productIds
+     * @return
+     */
+    Map<String, Object> deleteCartItem(@NotEmpty(message = "productIds不能为空") List<String> productIds);
+
+    /**
+     * 清空购物车
+     * @return
+     */
+    Map<String, Object> deleteAllCartItem();
+
+    /**
+     *
+     * @param changeCartItemNumRequest
+     * @return
+     */
+    Map<String, Object> changeCartItemNum(ChangeCartItemNumRequest changeCartItemNumRequest);
 }
