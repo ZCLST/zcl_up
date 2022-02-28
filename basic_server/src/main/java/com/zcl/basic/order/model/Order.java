@@ -1,11 +1,14 @@
 package com.zcl.basic.order.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
 
@@ -31,6 +34,7 @@ public class Order implements Serializable {
     /**
      * 订单id
      */
+    @TableId(type= IdType.UUID)
     private String orderId;
     /**
      * 订单号
@@ -39,7 +43,7 @@ public class Order implements Serializable {
     /**
      * 订单总金额
      */
-    private String orderAmount;
+    private BigDecimal orderAmount;
     /**
      * 订单状态 0：待支付、1：待发货 2：已发货 3：已完成
      */
@@ -48,5 +52,8 @@ public class Order implements Serializable {
      * 创建时间
      */
     private String createTime;
-
+    /**
+     * 创建用户
+     */
+    private String userId;
 }

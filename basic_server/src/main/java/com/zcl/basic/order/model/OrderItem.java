@@ -1,11 +1,15 @@
 package com.zcl.basic.order.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @author 曾小白
@@ -24,10 +28,11 @@ public class OrderItem implements Serializable {
     public static final String WAREHOUSE_ID="warehouse_id";
     public static final String NUM="num";
     public static final String ORDER_ITEM_AMOUNT="order_itm_amount";
-    public static final String WAIT_FOR_DELIVERY_NUM="wait_for_delivery_num";
+    public static final String DELIVERY_NUM="delivery_num";
     /**
      * 订单细单ID
      */
+    @TableId(type=IdType.UUID)
     private String orderItemId;
     /**
      * 订单ID
@@ -44,14 +49,14 @@ public class OrderItem implements Serializable {
     /**
      * 购买数量
      */
-    private String num;
+    private BigDecimal num;
     /**
-     * 待发货数量
+     * 发货数量
      */
-    private String waitForDeliveryNum;
+    private BigDecimal deliveryNum;
     /**
      * 细单总金额
      */
-    private String orderItemAmount;
+    private BigDecimal orderItemAmount;
 
 }

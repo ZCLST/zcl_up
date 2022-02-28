@@ -3,9 +3,11 @@ package com.zcl.basic.warehouse.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zcl.basic.log.vo.FunctionLogPageVo;
 import com.zcl.basic.product.dto.ProductStockDto;
+import com.zcl.basic.warehouse.model.ProductWarehouseRel;
 import com.zcl.basic.warehouse.model.WareHouse;
 import com.zcl.basic.warehouse.vo.SelectPageWarehouseVo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -42,4 +44,20 @@ public interface WarehouseService {
      * @return
      */
     List<ProductStockDto> selectStock(List<String> productIds);
+
+    /**
+     * 根据仓库编码查询商品库存
+     * @param productId
+     * @param code
+     * @return
+     */
+    BigDecimal findSockByProductIdAndWarehouseCode(String productId, String code);
+
+    /**
+     * 根据仓库编码、商品ID扣减库存
+     * @param productId
+     * @param warehouseId
+     * @param num
+     */
+    void deductingTheStockByProductIdAndWarehouseId(String productId, String warehouseId, BigDecimal num);
 }

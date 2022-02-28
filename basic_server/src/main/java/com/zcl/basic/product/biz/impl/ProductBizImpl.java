@@ -176,6 +176,16 @@ public class ProductBizImpl implements ProductBiz {
     @Override
     @Transactional
     public Map<String, Object> addCart(String productId) {
+        //判断该商品是否存在库存
+        List<String> list = new ArrayList<>();
+        list.add(productId);
+        List<ProductStockDto> productStockDtoList = warehouseService.selectStock(list);
+        if(CollectionUtils.isEmpty(productStockDtoList)){
+            throw new ZfException("该商品库存不足！");
+        }
+        if(productStockDtoList.get(0).getStock().compareTo(new BigDecimal("0"))!=1){
+            throw new ZfException("该商品库存不足！");
+        }
         String userId = ContextUtils.getUserId();
         Object userByUid = userFeignClient.findUserByUid(userId);
         Assert.notNull(userByUid, "该用户不存在！");
