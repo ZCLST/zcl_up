@@ -181,7 +181,7 @@ public class OrderBizImpl implements OrderBiz {
         Order order = new Order();
         BigDecimal totalAmount = new BigDecimal("0");
         String orderNumber = OrderUtil.generateOrderNumber();
-        String nowTime = DateUtils.getNowTime();
+        Date nowTime = new Date();
         for (OrderItem orderItem :
                 orderItems) {
             totalAmount = totalAmount.add(orderItem.getOrderItemAmount());

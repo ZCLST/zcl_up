@@ -75,7 +75,7 @@ public class OrderController {
      * @param orderId
      * @return
      */
-    @PostMapping(value = "/cancelOrder.json")
+    @PostMapping(value = "/showOrderDetail.json")
     public Map<String,Object> showOrderDetail(@RequestBody String orderId ){
         return  orderBiz.showOrderDetail(orderId);
     }
