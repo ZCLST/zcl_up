@@ -92,10 +92,13 @@ public class OrderBizImpl implements OrderBiz {
     @Override
     public Map<String, Object> payOrder(List<String> orderIds) {
         List<Order> orderList = orderService.selectOrderById(orderIds);
-        orderList.stream().forEach(order -> {
-            order.setStatus(OrderStatusEnum.WAIT_DELIVER.getCode());
-        });
-        return CommonResponse.setResponseData(orderList);
+        if(CollectionUtils.isNotEmpty(orderList)){
+            orderList.stream().forEach(order -> {
+                order.setStatus(OrderStatusEnum.WAIT_DELIVER.getCode());
+                orderService.updateOrder(order);
+            });
+        }
+        return CommonResponse.setResponseData(null);
     }
 
     @Override

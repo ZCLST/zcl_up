@@ -46,4 +46,10 @@ public interface OrderService {
      * @param orderIds
      */
     void deleteOrderById(List<String> orderIds);
+
+    /**
+     * 更新订单
+     * @param order
+     */
+    void updateOrder(Order order);
 }

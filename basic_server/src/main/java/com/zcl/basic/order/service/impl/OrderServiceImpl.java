@@ -52,5 +52,10 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.deleteBatchIds(orderIds);
     }
 
+    @Override
+    public void updateOrder(Order order) {
+        orderMapper.updateById(order);
+    }
+
 
 }

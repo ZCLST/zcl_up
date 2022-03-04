@@ -7,7 +7,8 @@
         where user_id = #{userId}
           and status=${status}
           <if test="orderNum!=null and orderNum!=''">
-              and order_num = #{orderNum}
+              and order_num like CONCAT("%",#{orderNum},"%")
           </if>
+        order by create_time desc
     </select>
 </mapper>
