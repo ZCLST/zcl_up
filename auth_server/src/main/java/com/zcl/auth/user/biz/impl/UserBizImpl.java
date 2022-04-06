@@ -90,6 +90,14 @@ public class UserBizImpl implements UserBiz {
         //获取当前时间
         String nowTime = DateUtils.getNowTime();
         User convert = BeanUtil.convert(userRequest, User.class);
+        String pw=null;
+        try {
+            pw=MD5Util.EncoderByMd5(userRequest.getPassword());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ZfException("MD5加密失败");
+        }
+        convert.setPassword(pw);
         //判断用户名是否存在
         List<User> users = userService.listUsers();
         List<User> collect_user = users.stream().filter(u ->
