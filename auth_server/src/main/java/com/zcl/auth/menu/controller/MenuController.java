@@ -44,6 +44,7 @@ public class MenuController {
      * 菜单管理获取所有菜单
      * @return
      */
+    @PointLog(id = LogTypeEnum.MENU_MAN)
     @GetMapping(value = "/selectAllMenus.json")
     public Map<String, Object> selectAllMenus() {
         return menuBiz.selectAllMenus();

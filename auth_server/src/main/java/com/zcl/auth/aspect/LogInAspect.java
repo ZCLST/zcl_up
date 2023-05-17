@@ -13,7 +13,7 @@ import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.util.DateUtils;
 import com.zcl.util.general.util.JedisUtil;
 import com.zcl.util.general.util.MD5Util;
-import io.jsonwebtoken.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -23,6 +23,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -33,12 +34,14 @@ import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * @author 曾小白
  * @create 2022/1/18 12:44
  * @desc 登录日志切面类
  **/
+@Slf4j
 @Aspect
 @Component
 public class LogInAspect {
@@ -46,43 +49,20 @@ public class LogInAspect {
     private LogFeignClient logFeignClient;
     @Autowired
     private UserService userService;
-    private String userName;
-    private String userId;
 
     //切点为loginChek()方法
     @Pointcut("execution(* com.zcl.auth.user.controller.UserController.checkUser(..))")
     private void pointCut() {
     }
 
-    //前置通知 用来赋值
-    @Before("pointCut()")
-    public void before(JoinPoint joinPoint) {
-        System.out.println("-----------前置通知--------");
-        Object[] args = joinPoint.getArgs();
-        LoginRequest user = (LoginRequest) args[0];
-        userName = user.getuName();
-        String password = user.getPassword();
-        String md5Pw = null;
-        try {
-            md5Pw = MD5Util.EncoderByMd5(password);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ZfException("用户名或密码不正确");
-        }
-        User userByNameAndPassWord = userService.findUserByNameAndPassWord(userName, md5Pw);
-        if (userByNameAndPassWord != null) {
-            userId = userByNameAndPassWord.getuId();
-        }
-        System.out.println("-----------前置通知完--------");
-    }
 
     @Around("pointCut()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        System.out.println("环绕通知：---------------------");
-        //获得方法执行后的返回值
-        Object proceed = pjp.proceed();//让目标方法执行
         //获取当前时间
         String date = DateUtils.getNowTime();
+        String userId = this.handleBefore(pjp);
+        //让目标方法执行,获得方法执行后的返回值
+        Object proceed = pjp.proceed();
         LogDto logDto = new LogDto();
         logDto.setAction(LogTypeEnum.LOGIN.getDesc());
         logDto.setCreateUser(userId);
@@ -90,4 +70,22 @@ public class LogInAspect {
         logFeignClient.saveLog(logDto);
         return proceed;
     }
+
+    private String handleBefore(ProceedingJoinPoint pjp) {
+        Object[] args = pjp.getArgs();
+        LoginRequest info = (LoginRequest) args[0];
+        String userName = info.getuName();
+        String password = info.getPassword();
+        String md5Pw = null;
+        try {
+            md5Pw = MD5Util.EncoderByMd5(password);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ZfException("密码加密失败");
+        }
+        User user = userService.findUserByNameAndPassWord(userName, md5Pw);
+        if(Objects.isNull(user)) throw new ZfException("用户名或密码错误！");
+        return user.getuId();
+    }
+
 }

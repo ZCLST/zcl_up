@@ -5,6 +5,7 @@ import com.zcl.auth.user.request.LoginRequest;
 import com.zcl.auth.user.request.UserPageRequest;
 import com.zcl.auth.user.request.UserRequest;
 import com.zcl.util.general.annotation.PointLog;
+import com.zcl.util.general.enums.LogTypeEnum;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -52,6 +53,7 @@ public class UserController {
      * @param userPageRequest
      * @return
      */
+    @PointLog(id = LogTypeEnum.USER_MAN)
     @PostMapping("/listUser.json")
     public Map<String, Object> listUser(@RequestBody UserPageRequest userPageRequest) {
         return userBiz.listUser(userPageRequest);

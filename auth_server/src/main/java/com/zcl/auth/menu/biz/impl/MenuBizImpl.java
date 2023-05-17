@@ -156,7 +156,7 @@ public class MenuBizImpl implements MenuBiz {
         String token = httpServletRequest.getHeader(SysCodeEnum.HEADER_NAME.getCode());
         Jedis jedis = JedisUtil.getJedis();
         String uId = jedis.get(token);
-        menu.setCreateTime(DateUtils.getNowTime());
+        menu.setCreateTime(new Date());
         menu.setCreateUser(uId);
         menuService.addMenu(menu);
         return CommonResponse.setResponseData(null);
@@ -212,7 +212,7 @@ public class MenuBizImpl implements MenuBiz {
         menu.setmName(menuRequest.getmName());
         menu.setmSort(menuRequest.getmSort());
         menu.setmUrl(menuRequest.getmUrl());
-        menu.setUpdateTime(DateUtils.getNowTime());
+        menu.setUpdateTime(new Date());
         menu.setUpdateUser(uId);
         //更新
         menuService.updateMenu(menu);

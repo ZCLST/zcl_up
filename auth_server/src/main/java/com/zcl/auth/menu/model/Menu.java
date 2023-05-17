@@ -3,8 +3,10 @@ package com.zcl.auth.menu.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author zcl
@@ -76,7 +78,8 @@ public class Menu implements Serializable {
     /**
      * 创建时间
      */
-    private String createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
 
     /**
      * 修改人
@@ -86,25 +89,13 @@ public class Menu implements Serializable {
     /**
      * 修改时间
      */
-    private String updateTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTime;
 
     public Menu() {
     }
 
-    public Menu(String mId, String mName, String pMenu, String isNavigation, String mUrl, String mIcon, Integer mSort, String mDesc, String createUser, String createTime, String updateUser, String updateTime) {
-        this.mId = mId;
-        this.mName = mName;
-        this.pMenu = pMenu;
-        this.isNavigation = isNavigation;
-        this.mUrl = mUrl;
-        this.mIcon = mIcon;
-        this.mSort = mSort;
-        this.mDesc = mDesc;
-        this.createUser = createUser;
-        this.createTime = createTime;
-        this.updateUser = updateUser;
-        this.updateTime = updateTime;
-    }
+
 
     public String getmId() {
         return mId;
@@ -178,11 +169,11 @@ public class Menu implements Serializable {
         this.createUser = createUser;
     }
 
-    public String getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
@@ -194,11 +185,11 @@ public class Menu implements Serializable {
         this.updateUser = updateUser;
     }
 
-    public String getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(String updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 }

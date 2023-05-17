@@ -1,6 +1,6 @@
 package com.zcl.util.general.util;
 
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -16,21 +16,24 @@ import java.security.NoSuchAlgorithmException;
 
  **/
 public class MD5Util {
-    /**利用MD5进行加密*/
+    /**
+     * 利用MD5进行加密
+     */
     public static String EncoderByMd5(String str) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         //确定计算方法
-        MessageDigest md5=MessageDigest.getInstance("MD5");
-        BASE64Encoder base64en = new BASE64Encoder();
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
         //加密后的字符串
-        String newstr=base64en.encode(md5.digest(str.getBytes("utf-8")));
-        return newstr;
+        String newStr = Base64.encodeBase64String(md5.digest(str.getBytes("utf-8")));
+        return newStr;
     }
 
-    /**判断用户密码是否正确
-     *newpasswd 用户输入的密码
-     *oldpasswd 正确密码*/
-    public static boolean checkpassword(String newpasswd,String oldpasswd) throws NoSuchAlgorithmException, UnsupportedEncodingException{
-        if(EncoderByMd5(newpasswd).equals(oldpasswd))
+    /**
+     * 判断用户密码是否正确
+     * newpasswd 用户输入的密码
+     * oldpasswd 正确密码
+     */
+    public static boolean checkPassword(String newPasswd, String oldPasswd) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        if (EncoderByMd5(newPasswd).equals(oldPasswd))
             return true;
         else
             return false;

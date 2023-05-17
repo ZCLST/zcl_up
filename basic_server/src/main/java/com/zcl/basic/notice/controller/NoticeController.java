@@ -1,6 +1,5 @@
 package com.zcl.basic.notice.controller;
 
-import com.sun.org.apache.regexp.internal.RE;
 import com.zcl.basic.notice.biz.NoticeBiz;
 import com.zcl.basic.notice.request.CheckTheNoticeRequest;
 import com.zcl.basic.notice.request.NoticePageRequest;

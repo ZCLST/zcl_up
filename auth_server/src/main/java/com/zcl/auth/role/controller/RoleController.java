@@ -7,6 +7,8 @@ import com.zcl.auth.role.request.RoleAddRequest;
 import com.zcl.auth.role.request.RolePageRequest;
 import com.zcl.auth.role.request.RoleUpdateRequest;
 import com.zcl.util.general.annotation.PointLog;
+import com.zcl.util.general.enums.ActionTypeEnum;
+import com.zcl.util.general.enums.LogTypeEnum;
 import com.zcl.util.general.response.CommonResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,7 @@ public class RoleController {
      *
      * @return
      */
+    @PointLog(id = LogTypeEnum.ROLE_MAN)
     @GetMapping("/selectAllRoles.json")
     public Map<String, Object> selectAllRoles() {
         return roleBiz.selectAllRoles();

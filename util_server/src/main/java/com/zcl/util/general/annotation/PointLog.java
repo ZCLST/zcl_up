@@ -1,5 +1,7 @@
 package com.zcl.util.general.annotation;
 
+import com.zcl.util.general.enums.LogTypeEnum;
+
 import java.lang.annotation.*;
 
 /**
@@ -19,8 +21,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented//表示是否将注解信息添加在java文档中
 public @interface PointLog {
-    //功能编号
-    String id() default "";
-    //描述
-    String value() default "";
+    //功能枚举
+    LogTypeEnum id() default LogTypeEnum.INDEX;
 }
