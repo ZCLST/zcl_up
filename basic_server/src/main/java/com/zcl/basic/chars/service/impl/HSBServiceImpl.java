@@ -1,7 +1,7 @@
 package com.zcl.basic.chars.service.impl;
 
 import com.zcl.basic.chars.mapper.HSBMapper;
-import com.zcl.basic.chars.request.showMainClassCharsRequest;
+import com.zcl.basic.chars.request.ShowMainClassCharsRequest;
 import com.zcl.basic.chars.service.HSBService;
 import com.zcl.basic.chars.vo.ShowCharsVo;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class HSBServiceImpl implements HSBService {
     }
 
     @Override
-    public ShowCharsVo showMainClassChars(showMainClassCharsRequest request) {
+    public List<ShowCharsVo> showMainClassChars(ShowMainClassCharsRequest request) {
         return hsbMapper.showMainClassChars(request);
     }
 
@@ -34,5 +34,10 @@ public class HSBServiceImpl implements HSBService {
     @Override
     public List<String> selectDistinctVillagesAndTowns() {
         return hsbMapper.selectDistinctVillagesAndTowns();
+    }
+
+    @Override
+    public List<ShowCharsVo> showScoreLevelChars(ShowMainClassCharsRequest request) {
+        return hsbMapper.showScoreLevelChars(request);
     }
 }

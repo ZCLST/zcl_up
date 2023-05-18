@@ -1,7 +1,7 @@
 package com.zcl.basic.chars.controller;
 
 import com.zcl.basic.chars.biz.HSBBiz;
-import com.zcl.basic.chars.request.showMainClassCharsRequest;
+import com.zcl.basic.chars.request.ShowMainClassCharsRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ public class HSBController {
      * @return
      */
     @PostMapping("/showMainClassChars")
-    public Map<String, Object> showMainClassChars(@RequestBody showMainClassCharsRequest request) {
+    public Map<String, Object> showMainClassChars(@RequestBody ShowMainClassCharsRequest request) {
         return hsbBiz.showMainClassChars(request);
     }
 
@@ -48,13 +48,13 @@ public class HSBController {
         return hsbBiz.selectDistinctVillagesAndTowns();
     }
 
-//    /**
-//     * 展示自评等级图
-//     * @param request
-//     * @return
-//     */
-//    @PostMapping("/ShowScoreChars")
-//    public Map<String, Object> showMainClassChars(@RequestBody ShowScoreCharsRequest request) {
-//        return hsbBiz.ShowScoreChars(request);
-//    }
+    /**
+     * 展示自评等级图
+     * @param request
+     * @return
+     */
+    @PostMapping("/showScoreLevelChars")
+    public Map<String, Object> showScoreLevelChars(@RequestBody ShowMainClassCharsRequest request) {
+        return hsbBiz.showScoreLevelChars(request);
+    }
 }

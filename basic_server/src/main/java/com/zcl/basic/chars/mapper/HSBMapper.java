@@ -2,8 +2,9 @@ package com.zcl.basic.chars.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zcl.basic.chars.model.HSBModel;
-import com.zcl.basic.chars.request.showMainClassCharsRequest;
+import com.zcl.basic.chars.request.ShowMainClassCharsRequest;
 import com.zcl.basic.chars.vo.ShowCharsVo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface HSBMapper extends BaseMapper<HSBModel> {
      * @param request
      * @return
      */
-    ShowCharsVo showMainClassChars(showMainClassCharsRequest request);
+    List<ShowCharsVo> showMainClassChars(@Param("request") ShowMainClassCharsRequest request);
 
     /**
      * 获取17版基本类型（不重复）
@@ -33,4 +34,11 @@ public interface HSBMapper extends BaseMapper<HSBModel> {
      * @return
      */
     List<String> selectDistinctVillagesAndTowns();
+
+    /**
+     * 展示自评等级图
+     * @param request
+     * @return
+     */
+    List<ShowCharsVo> showScoreLevelChars(@Param("request") ShowMainClassCharsRequest request);
 }

@@ -1,7 +1,7 @@
 package com.zcl.basic.chars.biz.impl;
 
 import com.zcl.basic.chars.biz.HSBBiz;
-import com.zcl.basic.chars.request.showMainClassCharsRequest;
+import com.zcl.basic.chars.request.ShowMainClassCharsRequest;
 import com.zcl.basic.chars.service.HSBService;
 import com.zcl.basic.chars.vo.ShowCharsVo;
 import com.zcl.util.general.response.CommonResponse;
@@ -24,8 +24,8 @@ public class HSBBizImpl implements HSBBiz {
     }
 
     @Override
-    public Map<String, Object> showMainClassChars(showMainClassCharsRequest request) {
-        ShowCharsVo vo = hsbService.showMainClassChars(request);
+    public Map<String, Object> showMainClassChars(ShowMainClassCharsRequest request) {
+        List<ShowCharsVo> vo = hsbService.showMainClassChars(request);
         return CommonResponse.setResponseData(vo);
     }
 
@@ -39,5 +39,11 @@ public class HSBBizImpl implements HSBBiz {
     public Map<String, Object> selectDistinctVillagesAndTowns() {
         List<String> list = hsbService.selectDistinctVillagesAndTowns();
         return CommonResponse.setResponseData(list);
+    }
+
+    @Override
+    public Map<String, Object> showScoreLevelChars(ShowMainClassCharsRequest request) {
+        List<ShowCharsVo> vo = hsbService.showScoreLevelChars(request);
+        return CommonResponse.setResponseData(vo);
     }
 }

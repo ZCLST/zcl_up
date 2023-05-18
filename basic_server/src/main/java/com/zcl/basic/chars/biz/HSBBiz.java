@@ -1,6 +1,7 @@
 package com.zcl.basic.chars.biz;
 
-import com.zcl.basic.chars.request.showMainClassCharsRequest;
+
+import com.zcl.basic.chars.request.ShowMainClassCharsRequest;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public interface HSBBiz {
      * @param request
      * @return
      */
-    Map<String, Object> showMainClassChars(showMainClassCharsRequest request);
+    Map<String, Object> showMainClassChars(ShowMainClassCharsRequest request);
 
     /**
      * 获取17版基本类型（不重复）
@@ -28,4 +29,11 @@ public interface HSBBiz {
      * @return
      */
     Map<String, Object> selectDistinctVillagesAndTowns();
+
+    /**
+     * 展示自评等级图
+     * @param request
+     * @return
+     */
+    Map<String, Object> showScoreLevelChars(ShowMainClassCharsRequest request);
 }

@@ -1,6 +1,6 @@
 package com.zcl.basic.chars.service;
 
-import com.zcl.basic.chars.request.showMainClassCharsRequest;
+import com.zcl.basic.chars.request.ShowMainClassCharsRequest;
 import com.zcl.basic.chars.vo.ShowCharsVo;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public interface HSBService {
      * @param request
      * @return
      */
-    ShowCharsVo showMainClassChars(showMainClassCharsRequest request);
+    List<ShowCharsVo> showMainClassChars(ShowMainClassCharsRequest request);
 
     /**
      * 获取17版基本类型（不重复）
@@ -29,4 +29,11 @@ public interface HSBService {
      * @return
      */
     List<String> selectDistinctVillagesAndTowns();
+
+    /**
+     * 展示自评等级图
+     * @param request
+     * @return
+     */
+    List<ShowCharsVo> showScoreLevelChars(ShowMainClassCharsRequest request);
 }
