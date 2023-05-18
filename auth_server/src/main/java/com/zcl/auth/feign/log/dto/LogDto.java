@@ -22,7 +22,6 @@ public class LogDto {
     /**
      * 创建时间
      */
-    @NotBlank(message = "createTime不能为空")
     private String createTime;
     /**
      * 用户id

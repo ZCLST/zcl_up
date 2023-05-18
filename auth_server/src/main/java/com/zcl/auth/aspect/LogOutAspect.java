@@ -54,15 +54,12 @@ public class LogOutAspect {
 
     @Around("pointCut()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        //获取当前时间
-        String date = DateUtils.getNowTime();
         String userId = this.handleBefore(pjp);
         //获得方法执行后的返回值
         Object proceed = pjp.proceed();//让目标方法执行
         LogDto logDto = new LogDto();
         logDto.setAction(LogTypeEnum.LOGOUT.getDesc());
         logDto.setCreateUser(userId);
-        logDto.setCreateTime(date);
         logFeignClient.saveLog(logDto);
         return proceed;
     }

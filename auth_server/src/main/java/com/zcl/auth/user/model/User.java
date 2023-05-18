@@ -3,6 +3,7 @@ package com.zcl.auth.user.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.zcl.util.general.entity.BaseEntity;
 
 import java.io.Serializable;
 
@@ -12,14 +13,12 @@ import java.io.Serializable;
  * @desc 用户实体类
  **/
 @TableName(value = "t_user")
-public class User implements Serializable {
+public class User extends BaseEntity {
     private static final long serialVersionUID = 8145882041586848115L;
     public static final String U_ID = "u_id";
     public static final String U_NAME = "u_name";
     public static final String PASSWORD = "password";
     public static final String R_Id = "r_id";
-    public static final String CREATE_TIME = "create_time";
-    public static final String UPDATE_TIME = "update_time";
     public static final String SEX = "sex";
     public static final String PHONE = "phone";
     public static final String EMAIL = "email";
@@ -40,14 +39,6 @@ public class User implements Serializable {
      */
     private String rId;
     /**
-     * 创建时间
-     */
-    private String createTime;
-    /**
-     * 修改时间
-     */
-    private String updateTime;
-    /**
      * 性别
      */
     private String sex;
@@ -67,18 +58,6 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String uId, String uName, String password, String rId, String createTime, String updateTime, String sex, String phone, String email, String status) {
-        this.uId = uId;
-        this.uName = uName;
-        this.password = password;
-        this.rId = rId;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-        this.sex = sex;
-        this.phone = phone;
-        this.email = email;
-        this.status = status;
-    }
 
     public String getuId() {
         return uId;
@@ -112,21 +91,6 @@ public class User implements Serializable {
         this.rId = rId;
     }
 
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(String updateTime) {
-        this.updateTime = updateTime;
-    }
 
     public String getSex() {
         return sex;

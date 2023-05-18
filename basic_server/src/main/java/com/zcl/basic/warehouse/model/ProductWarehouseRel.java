@@ -3,6 +3,7 @@ package com.zcl.basic.warehouse.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.zcl.util.general.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductWarehouseRel implements Serializable {
+public class ProductWarehouseRel extends BaseEntity {
 
     private static final long serialVersionUID = -1382297959027051238L;
     public static final String PRODUCT_WAREHOUSE_UD="productWarehouseId";
@@ -32,7 +33,6 @@ public class ProductWarehouseRel implements Serializable {
     public static final String WAREHOUSE_ID="warehouseId";
     public static final String STOCK="stock";
     public static final String STATUS="status";
-    public static final String CREATE_TIME="createTime";
 
     @TableId(type = IdType.UUID)
     private String productWarehouseId;
@@ -52,8 +52,5 @@ public class ProductWarehouseRel implements Serializable {
      * 0禁用，1启用
      */
     private String status;
-    /**
-     * 创建时间
-     */
-    private Date createTime;
+
 }

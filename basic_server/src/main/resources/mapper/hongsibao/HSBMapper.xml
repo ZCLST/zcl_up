@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcl.basic.chars.mapper.HSBMapper">
+    <select id="showMainClassChars" resultType="com.zcl.basic.chars.vo.ShowCharsVo">
+        SELECT main_class as name, COUNT(1) AS num
+        FROM t_hongsibao
+        <where>
+            <if test="request.baseType != null and request.baseType !=''">
+                AND base_type = #{request.baseType}
+            </if>
+            <if test="request.villagesAndTowns != null and request.villagesAndTowns !=''">
+                AND villages_and_towns = #{request.villagesAndTowns}
+            </if>
+        </where>
+        GROUP BY main_class
+    </select>
+    <select id="selectDistinctBaseType" resultType="java.lang.String">
+        SELECT DISTINCT base_type
+        FROM t_hongsibao
+    </select>
+    <select id="selectDistinctVillagesAndTowns" resultType="java.lang.String">
+        SELECT DISTINCT villages_and_towns
+        FROM t_hongsibao
+    </select>
+</mapper>

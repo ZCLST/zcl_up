@@ -3,6 +3,7 @@ package com.zcl.basic.order.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.zcl.util.general.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderItem implements Serializable {
+public class OrderItem extends BaseEntity {
     private static final long serialVersionUID = -7655480665118815214L;
     public static final String ORDER_ITEM_ID="order_item_id";
     public static final String ORDER_ID="order_id";

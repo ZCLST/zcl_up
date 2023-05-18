@@ -51,8 +51,6 @@ public class FunctionAspect {
         if (logAnnotation != null) {
             // 注解上的描述
             LogTypeEnum logTypeEnum = logAnnotation.id();
-            //获取当前时间
-            String date = DateUtils.getNowTime();
             //获取当前用户ID
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
@@ -63,7 +61,6 @@ public class FunctionAspect {
             LogDto logDto = new LogDto();
             logDto.setAction(functionName);
             logDto.setCreateUser(uId);
-            logDto.setCreateTime(date);
             logFeignClient.saveLog(logDto);
         }
         return proceed;

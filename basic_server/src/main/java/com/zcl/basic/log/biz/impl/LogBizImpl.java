@@ -79,19 +79,9 @@ public class LogBizImpl implements LogBiz {
 
     @Override
     public Map<String, Object> saveFunLog(String functionId) {
-        //获取当前时间
-        String date = DateUtils.getNowTime();
-        //获取当前用户ID
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-
-        String token = request.getHeader(SysCodeEnum.HEADER_NAME.getCode());
-        Jedis jedis = JedisUtil.getJedis();
-        String uId = jedis.get(token);
         String functionName = LogTypeEnum.getDescByCode(functionId).getDesc();
         Log log = new Log();
         log.setAction(functionName);
-        log.setCreateUser(uId);
-        log.setCreateTime(date);
         logService.saveLog(log);
         return null;
     }

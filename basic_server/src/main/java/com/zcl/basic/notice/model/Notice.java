@@ -3,6 +3,7 @@ package com.zcl.basic.notice.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.zcl.util.general.entity.BaseEntity;
 
 import java.io.Serializable;
 
@@ -16,7 +17,7 @@ import java.io.Serializable;
 
  **/
 @TableName(value = "t_notice")
-public class Notice implements Serializable {
+public class Notice extends BaseEntity {
     private static final long serialVersionUID = 3287659263037483763L;
 
     public static final String N_ID="n_id";
@@ -24,7 +25,6 @@ public class Notice implements Serializable {
     public static final String RECEIVE_MAN="receive_man";
     public static final String E_ID="e_id";
     public static final String HAVE_READ="have_read";
-    public static final String CREATE_TIME="create_time";
 
     @TableId(type = IdType.UUID)
     private String nId;
@@ -44,22 +44,12 @@ public class Notice implements Serializable {
      * 是否已读（0未读，1已读）
      */
     private String haveRead;
-    /**
-     * 创建时间
-     */
-    private String createTime;
+
 
     public Notice() {
     }
 
-    public Notice(String nId, String sendMan, String receiveMan, String eId, String haveRead, String createTime) {
-        this.nId = nId;
-        this.sendMan = sendMan;
-        this.receiveMan = receiveMan;
-        this.eId = eId;
-        this.haveRead = haveRead;
-        this.createTime = createTime;
-    }
+
 
     public String getnId() {
         return nId;
@@ -101,11 +91,4 @@ public class Notice implements Serializable {
         this.haveRead = haveRead;
     }
 
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
 }

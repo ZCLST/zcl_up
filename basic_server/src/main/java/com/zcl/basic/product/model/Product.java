@@ -3,6 +3,7 @@ package com.zcl.basic.product.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.zcl.util.general.entity.BaseEntity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ import java.util.Date;
 
  **/
 @TableName(value = "t_product")
-public class Product implements Serializable {
+public class Product extends BaseEntity {
     private static final long serialVersionUID = -425279956345107367L;
 
     public static final String PRODUCT_ID="product_id";
@@ -30,7 +31,6 @@ public class Product implements Serializable {
     public static final String SPECK="speck";
     public static final String PRODUCT_URL="product_url";
     public static final String STATUS="status";
-    public static final String CREATE_TIME="create_time";
     /**
      * 商品主键
      */
@@ -64,25 +64,11 @@ public class Product implements Serializable {
      * 是否启用0禁用，1启用
      */
     private String status;
-    /**
-     * 创建时间
-     */
-    private Date createTime;
+
 
     public Product() {
     }
 
-    public Product(String productId, String productCode, String productName, BigDecimal productMoney, BigDecimal stock, String speck, String productUrl, String status, Date createTime) {
-        this.productId = productId;
-        this.productCode = productCode;
-        this.productName = productName;
-        this.productMoney = productMoney;
-        this.stock = stock;
-        this.speck = speck;
-        this.productUrl = productUrl;
-        this.status = status;
-        this.createTime = createTime;
-    }
 
     public String getProductId() {
         return productId;
@@ -148,11 +134,5 @@ public class Product implements Serializable {
         this.status = status;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 }

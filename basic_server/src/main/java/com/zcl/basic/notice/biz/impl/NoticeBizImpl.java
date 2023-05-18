@@ -161,10 +161,7 @@ public class NoticeBizImpl implements NoticeBiz {
 
     private void saveEmail(String eId, SendEmailRequest sendEmailRequest) {
         Email email = new Email();
-        String nowTime = DateUtils.getNowTime();
         email.seteId(eId);
-        email.setCreateTime(nowTime);
-        email.setCreateUser(sendEmailRequest.getUserId());
         email.seteContent(sendEmailRequest.getEmailContent());
         email.seteTopic(sendEmailRequest.getEmailTopic());
         if (!CollectionUtils.isEmpty(sendEmailRequest.getFileVoList())) {
@@ -176,7 +173,6 @@ public class NoticeBizImpl implements NoticeBiz {
 
     private void saveNotice(String eId, SendEmailRequest sendEmailRequest) {
         Notice notice = new Notice();
-        String nowTime = DateUtils.getNowTime();
         String userId = ContextUtils.getUserId();
         Assert.hasLength(userId, "该用户不存在");
         String receiveMan = sendEmailRequest.getReceiveMan();
@@ -184,7 +180,6 @@ public class NoticeBizImpl implements NoticeBiz {
         //判断收件人是否存在
         Object o = userFeignClient.findUserByUid(receiveMan);
         Assert.notNull(o, "收件人【" + receiveMan + "】不存在");
-        notice.setCreateTime(nowTime);
         notice.seteId(eId);
         notice.setSendMan(userId);
         notice.setReceiveMan(receiveMan);

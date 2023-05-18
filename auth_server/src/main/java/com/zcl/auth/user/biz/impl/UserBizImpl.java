@@ -87,8 +87,6 @@ public class UserBizImpl implements UserBiz {
 
     @Override
     public Map<String, Object> addOrUpdateUser(@Valid UserRequest userRequest) {
-        //获取当前时间
-        String nowTime = DateUtils.getNowTime();
         User convert = BeanUtil.convert(userRequest, User.class);
         String pw=null;
         try {
@@ -107,13 +105,11 @@ public class UserBizImpl implements UserBiz {
             if (collect_user.size() != 0) {
                 throw new ZfException(convert.getuName() + ":用户名已经存在");
             }
-            convert.setCreateTime(nowTime);
             userService.saveUser(convert);
         } else {//更新
             if (collect_user.size() > 1) {
                 throw new ZfException(convert.getuName() + ":用户名已经存在");
             }
-            user.setUpdateTime(nowTime);
             user.setrId(convert.getrId());
             user.setEmail(convert.getEmail());
             user.setPhone(convert.getPhone());

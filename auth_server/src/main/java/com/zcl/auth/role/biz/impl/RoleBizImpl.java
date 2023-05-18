@@ -17,6 +17,7 @@ import com.zcl.util.general.util.DateUtils;
 import com.zcl.util.general.util.JedisUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Jedis;
 
@@ -73,8 +74,6 @@ public class RoleBizImpl implements RoleBiz {
         String time = DateUtils.getNowTime();
         Jedis jedis = JedisUtil.getJedis();
         String uId = jedis.get(token);
-        role.setCreateTime(time);
-        role.setCreateUser(uId);
         roleService.addRole(role);
     }
 
@@ -95,7 +94,6 @@ public class RoleBizImpl implements RoleBiz {
         }
         role.setRName(roleUpdateRequest.getRName());
         role.setRDesc(roleUpdateRequest.getRDesc());
-        role.setUpdateTime(DateUtils.getNowTime());
         roleService.updateRoleById(role);
     }
 
@@ -105,6 +103,7 @@ public class RoleBizImpl implements RoleBiz {
     }
 
     @Override
+    @Transactional
     public void bindMenus(String[] mIds) {
         String[] real_mid = Arrays.copyOf(mIds, mIds.length - 1);
         String rId = mIds[mIds.length - 1];

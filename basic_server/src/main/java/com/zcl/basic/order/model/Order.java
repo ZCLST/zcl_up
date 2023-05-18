@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.zcl.util.general.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,14 +26,13 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order implements Serializable {
+public class Order extends BaseEntity {
 
     private static final long serialVersionUID = -5854862369292366784L;
     public static final String ORDER_ID="order_id";
     public static final String ORDER_NUM="order_num";
     public static final String ORDER_AMOUNT="order_amount";
     public static final String STATUS="status";
-    public static final String CREATE_TIME="create_time";
     /**
      * 订单id
      */
@@ -50,11 +50,6 @@ public class Order implements Serializable {
      * 订单状态 0：待支付、1：待发货 2：已发货 3：已完成
      */
     private String status;
-    /**
-     * 创建时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createTime;
     /**
      * 创建用户
      */

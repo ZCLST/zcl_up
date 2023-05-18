@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.zcl.util.general.entity.BaseEntity;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,7 +15,7 @@ import java.util.Date;
  * @desc 菜单表
  **/
 @TableName(value = "t_menu")
-public class Menu implements Serializable {
+public class Menu extends BaseEntity {
     private static final long serialVersionUID = 2893331776391116670L;
     public static final String M_ID = "m_id";
     public static final String M_NAME = "m_name";
@@ -24,10 +25,6 @@ public class Menu implements Serializable {
     public static final String M_ICON = "m_icon";
     public static final String M_SORT = "m_sort";
     public static final String M_DESC = "m_desc";
-    public static final String CREATE_USER = "create_user";
-    public static final String CREATE_TIME = "create_time";
-    public static final String UPDATE_USER = "update_user";
-    public static final String UPDATE_TIME = "update_time";
     /**
      * 自定义主键生成策略
      */
@@ -70,31 +67,9 @@ public class Menu implements Serializable {
      */
     private String mDesc;
 
-    /**
-     * 创建人
-     */
-    private String createUser;
-
-    /**
-     * 创建时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createTime;
-
-    /**
-     * 修改人
-     */
-    private String updateUser;
-
-    /**
-     * 修改时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateTime;
 
     public Menu() {
     }
-
 
 
     public String getmId() {
@@ -161,35 +136,4 @@ public class Menu implements Serializable {
         this.mDesc = mDesc;
     }
 
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getUpdateUser() {
-        return updateUser;
-    }
-
-    public void setUpdateUser(String updateUser) {
-        this.updateUser = updateUser;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

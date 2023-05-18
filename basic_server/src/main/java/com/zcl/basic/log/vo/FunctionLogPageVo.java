@@ -1,8 +1,11 @@
 package com.zcl.basic.log.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
 
@@ -21,7 +24,8 @@ public class FunctionLogPageVo {
     /**
      * 创建时间
      */
-    private String createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
     /**
      * 用户id
      */
