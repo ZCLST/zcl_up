@@ -15,13 +15,5 @@ import org.springframework.web.bind.annotation.PostMapping;
  **/
 @Repository
 public interface UserMapper extends BaseMapper<User> {
-    /**
-     * 动态分页查询用户
-     * @param userPage
-     * @param userPageRequest
-     * @return
-     */
-    IPage<User> listUser(@Param("userPage") IPage<User> userPage,@Param("userPageRequest") UserPageRequest userPageRequest);
-
 
 }

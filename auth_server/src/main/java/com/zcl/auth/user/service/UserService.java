@@ -30,37 +30,5 @@ public interface UserService {
      */
     User findUserByUid(String uId);
 
-    /**
-     *
-     * 动态分页查询用户
-     * @param userPage
-     * @param userPageRequest
-     * @return
-     */
-    IPage<User> listUser(IPage<User> userPage, UserPageRequest userPageRequest);
-
-    /**
-     * 新增用户
-     * @param user
-     */
-    void saveUser(User user);
-
-    /**
-     * 更新用户
-     * @param user
-     */
-    void updateUser(User user);
-
-    /**
-     * 查询所有用户
-     * @return
-     */
-    List<User> listUsers();
-
-    /**
-     * 根据uId批量删除用户
-     * @param uid_list
-     */
-    void deleteBatchUser(List<String> uid_list);
 
 }

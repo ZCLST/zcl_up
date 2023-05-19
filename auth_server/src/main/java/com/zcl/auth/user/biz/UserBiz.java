@@ -31,42 +31,10 @@ public interface UserBiz {
     Map checkUserLogin(@Valid LoginRequest loginRequest);
 
     /**
-     * 动态分页查询用户
-     * @param userPageRequest
-     * @return
-     */
-    Map<String, Object> listUser(UserPageRequest userPageRequest);
-
-    /**
-     * 添加用户
-     * @param userRequest
-     * @return
-     */
-    Map<String, Object> addOrUpdateUser(@Valid UserRequest userRequest);
-
-    /**
-     * 根据uId批量删除用户
-     * @param uid_list
-     * @return
-     */
-    Map<String, Object> deleteBatchUser(List<String> uid_list);
-
-    /**
-     * 根据UID查询用户
-     * @param uId
-     * @return
-     */
-    Map<String, Object> findUserByUid(String uId);
-
-    /**
      * 用户登出
      * @return
      */
     Map<String, Object> logOut();
 
-    /**
-     * 查询所有用户
-     * @return
-     */
-    Map<String, Object> selectAllUser();
+
 }

@@ -1,36 +1,26 @@
 package com.zcl.auth.user.biz.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zcl.auth.user.biz.UserBiz;
 import com.zcl.auth.user.model.User;
 import com.zcl.auth.user.request.LoginRequest;
-import com.zcl.auth.user.request.UserPageRequest;
-import com.zcl.auth.user.request.UserRequest;
 import com.zcl.auth.user.service.UserService;
-import com.zcl.auth.user.vo.UserTokenVo;
-import com.zcl.util.general.enums.StatusEnum;
 import com.zcl.util.general.enums.SysCodeEnum;
 import com.zcl.util.general.exception.ZfException;
 import com.zcl.util.general.response.CommonResponse;
-import com.zcl.util.general.util.*;
+import com.zcl.util.general.util.JedisUtil;
+import com.zcl.util.general.util.JwtUtil;
+import com.zcl.util.general.util.MD5Util;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author zcl
@@ -78,63 +68,6 @@ public class UserBizImpl implements UserBiz {
         }
     }
 
-    @Override
-    public Map<String, Object> listUser(UserPageRequest userPageRequest) {
-        IPage<User> userPage = new Page<>(userPageRequest.getPageIndex(), userPageRequest.getPageSize());
-        IPage<User> userIPage = userService.listUser(userPage, userPageRequest);
-        return CommonResponse.setResponseData(userIPage);
-    }
-
-    @Override
-    public Map<String, Object> addOrUpdateUser(@Valid UserRequest userRequest) {
-        User convert = BeanUtil.convert(userRequest, User.class);
-        String pw=null;
-        try {
-            pw=MD5Util.EncoderByMd5(userRequest.getPassword());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ZfException("MD5加密失败");
-        }
-        convert.setPassword(pw);
-        //判断用户名是否存在
-        List<User> users = userService.listUsers();
-        List<User> collect_user = users.stream().filter(u ->
-                StringUtils.equals(u.getuName(), convert.getuName())).collect(Collectors.toList());
-        User user = userService.findUserByUid(convert.getuId());
-        if (user == null) {//新增
-            if (collect_user.size() != 0) {
-                throw new ZfException(convert.getuName() + ":用户名已经存在");
-            }
-            userService.saveUser(convert);
-        } else {//更新
-            if (collect_user.size() > 1) {
-                throw new ZfException(convert.getuName() + ":用户名已经存在");
-            }
-            user.setrId(convert.getrId());
-            user.setEmail(convert.getEmail());
-            user.setPhone(convert.getPhone());
-            user.setSex(convert.getSex());
-            user.setuName(convert.getuName());
-            userService.updateUser(user);
-        }
-        return CommonResponse.setResponseData(null);
-    }
-
-    @Override
-    public Map<String, Object> deleteBatchUser(List<String> uid_list) {
-        if (CollectionUtils.isEmpty(uid_list)) throw new ZfException("用户ID不能为空");
-        userService.deleteBatchUser(uid_list);
-        return CommonResponse.setResponseData(null);
-    }
-
-    @Override
-    public Map<String, Object> findUserByUid(String uId) {
-        if (StringUtils.isBlank(uId)) {
-            throw new ZfException("uId不能为空");
-        }
-        User user = userService.findUserByUid(uId);
-        return CommonResponse.setResponseData(user);
-    }
 
     @Override
     public Map<String, Object> logOut() {
@@ -147,9 +80,4 @@ public class UserBizImpl implements UserBiz {
         return CommonResponse.setResponseData(null);
     }
 
-    @Override
-    public Map<String, Object> selectAllUser() {
-        List<User> list=userService.listUsers();
-        return CommonResponse.setResponseData(list);
-    }
 }
