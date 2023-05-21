@@ -17,14 +17,7 @@ public class JedisUtil {
     private static int port;
     private static int maxToal;
     private static int maxIdel;
-    /**
-     * 购物车key
-     */
-    public static final String CART_KEY="cart:usersId:%s";
-    /**
-     * 商品详情key
-     */
-    public static final String PRODUCT_KEY="productInfo:productId:%s";
+
     /**
      * 密码
      */
