@@ -7,11 +7,7 @@ import com.zcl.util.general.entity.BaseEntity;
 
 import java.io.Serializable;
 
-/**
- * @author 曾小白
- * @create 2021/7/21 13:47
- * @desc 用户实体类
- **/
+
 @TableName(value = "t_user")
 public class User extends BaseEntity {
     private static final long serialVersionUID = 8145882041586848115L;
@@ -26,33 +22,19 @@ public class User extends BaseEntity {
 
     @TableId(type = IdType.UUID)
     private String uId;
-    /**
-     * 用户名称
-     */
+    
     private String uName;
-    /**
-     * 用户密码
-     */
+    
     private String password;
-    /**
-     * 角色ID
-     */
+    
     private String rId;
-    /**
-     * 性别
-     */
+    
     private String sex;
-    /**
-     * 手机号
-     */
+    
     private String phone;
-    /**
-     * 邮箱
-     */
+    
     private String email;
-    /**
-     * 0:正常 1:注销
-     */
+    
     private String status;
 
     public User() {

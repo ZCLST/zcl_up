@@ -10,11 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @authoer:zengcl
- * @createDate:2023/5/18
- * @description:
- */
+
 @Service
 public class HSBBizImpl implements HSBBiz {
     private HSBService hsbService;

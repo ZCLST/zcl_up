@@ -1,10 +1,6 @@
 package com.zcl.util.general.enums;
 
-/**
- * @author zcl
- * @create 2022/1/15 11:07
- * @desc 系统枚举类
- **/
+
 public enum SysCodeEnum {
     HEADER_NAME("Authorization", "前端token请求头");
 

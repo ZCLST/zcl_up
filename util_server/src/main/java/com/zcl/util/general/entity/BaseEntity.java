@@ -7,36 +7,24 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * @authoer:zengcl
- * @createDate:2023/5/18
- * @description:基本实体类
- */
+
 public abstract class BaseEntity implements Serializable {
     public static final String CREATE_USER = "create_user";
     public static final String CREATE_TIME = "create_time";
     public static final String UPDATE_USER = "update_user";
     public static final String UPDATE_TIME = "update_time";
-    /**
-     * 创建时间
-     */
+    
     @TableField(fill = FieldFill.INSERT)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
-    /**
-     * 创建人
-     */
+    
     @TableField(fill = FieldFill.INSERT)
     private String createUser;
-    /**
-     * 更新时间
-     */
+    
     @TableField(fill = FieldFill.INSERT_UPDATE)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
-    /**
-     * 更新人
-     */
+    
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateUser;
 

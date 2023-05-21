@@ -5,11 +5,7 @@ import com.zcl.util.general.entity.BaseEntity;
 
 import java.util.Date;
 
-/**
- * @authoer:zengcl
- * @createDate:2023/5/18
- * @description:红寺堡实体类
- */
+
 @TableName(value = "t_hongsibao")
 public class HSBModel extends BaseEntity {
     private static final long serialVersionUID = 732904937967162774L;
@@ -34,93 +30,49 @@ public class HSBModel extends BaseEntity {
     public static final String PRINCIPAL="principal";
 
     private Integer id;
-    /**
-     * 名称
-     */
+    
     private String name;
-    /**
-     * 17版主类
-     */
+    
     private String mainClass;
-    /**
-     * 17版亚类
-     */
+    
     private String subClass;
-    /**
-     * 17版基本类型
-     */
+    
     private String baseType;
-    /**
-     * 新标准主类
-     */
+    
     private String newStandardMainClass;
-    /**
-     * 新标准亚类
-     */
+    
     private String newStandardSubClass;
-    /**
-     * 新标准基本类型
-     */
+    
     private String newStandardBaseType;
-    /**
-     * 所在景区或集合体
-     */
+    
     private String scenicSpot;
-    /**
-     * 市
-     */
+    
     private String city;
-    /**
-     * 县或区
-     */
+    
     private String county;
-    /**
-     * 乡镇
-     */
+    
     private String villagesAndTowns;
-    /**
-     * 详细地址
-     */
+    
     private String address;
-    /**
-     * Xwgs84
-     */
+    
     private String xwgs84;
-    /**
-     * Ywgs84
-     */
+    
     private String ywgs84;
-    /**
-     * 来源
-     */
+    
     private String source;
-    /**
-     * 自评等级
-     */
+    
     private String level;
-    /**
-     * 评分
-     */
+    
     private String score;
-    /**
-     * 区县负责人
-     */
+    
     private String principal;
-    /**
-     * 创建人
-     */
+    
     private String createUser;
-    /**
-     * 创建时间
-     */
+    
     private Date createTime;
-    /**
-     * 修改人
-     */
+    
     private String updateUser;
-    /**
-     * 修改时间
-     */
+    
     private Date updateTime;
 
 

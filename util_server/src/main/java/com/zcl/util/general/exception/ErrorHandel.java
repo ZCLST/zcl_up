@@ -12,19 +12,11 @@ import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author 曾小白
- * @create 2021/7/21 10:14
- * @desc 全局异常拦截器
- **/
+
 @Slf4j
 @ControllerAdvice
 public class ErrorHandel {
-    /**
-     * 全局异常拦截
-     *
-     * @return
-     */
+    
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public Map globalExceptionHandle(Exception e) {

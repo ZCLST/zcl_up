@@ -7,11 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/**
- * @author zcl
- * @create 2021/12/18 16:06
- * @desc 用户控制层
- **/
+
 @RestController
 @RequestMapping("/userController")
 public class UserController {
@@ -21,22 +17,13 @@ public class UserController {
         this.userBiz = userBiz;
     }
 
-    /**
-     * 用户登录校验
-     *
-     * @param loginRequest
-     * @return
-     */
+    
     @PostMapping("/checkUser.form")
     public Map<String, Object> checkUser(@RequestBody LoginRequest loginRequest) {
         return userBiz.checkUserLogin(loginRequest);
     }
 
-    /**
-     * 用户登出
-     *
-     * @return
-     */
+    
     @GetMapping("/logOut.json")
     public Map<String, Object> logOut() {
         return userBiz.logOut();

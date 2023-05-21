@@ -7,10 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author frt
- * @date 2019/12/10 16:18
- */
+
 @SuppressWarnings("unchecked")
 public final class BeanUtil extends org.springframework.beans.BeanUtils {
     private BeanUtil() {
@@ -18,12 +15,7 @@ public final class BeanUtil extends org.springframework.beans.BeanUtils {
 
     public interface Callback<T, R> {
 
-        /**
-         * 回调方法
-         * @param source
-         * @param targetClass
-         * @return
-         */
+        
         void doCallback(T source, R targetClass);
 
     }
@@ -35,7 +27,7 @@ public final class BeanUtil extends org.springframework.beans.BeanUtils {
             R target = null;
 
             try {
-                target = targetClass.newInstance();//NOSONAR
+                target = targetClass.newInstance();
             } catch (IllegalAccessException | InstantiationException var4) {
                 throw new ZfException("bean转换异常");
             }

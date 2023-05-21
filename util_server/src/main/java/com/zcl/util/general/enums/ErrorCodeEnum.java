@@ -1,10 +1,6 @@
 package com.zcl.util.general.enums;
 
-/**
- * @author 曾小白
- * @create 2021/7/21 10:22
- * @desc 异常状态码枚举
- **/
+
 public enum ErrorCodeEnum {
 
     TIMEOUT("111", "登录超时"),

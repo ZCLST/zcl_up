@@ -1,10 +1,6 @@
 package com.zcl.util.general.enums;
 
-/**
- * @author 曾小白
- * @create 2021/7/21 10:25
- * @desc 请求状态枚举类
- **/
+
 public enum StatusEnum {
     SUCCESS(true, "0", "成功"),
     FAIL(false, "1", "失败"),

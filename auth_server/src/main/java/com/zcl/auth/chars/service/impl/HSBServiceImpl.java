@@ -8,11 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * @authoer:zengcl
- * @createDate:2023/5/18
- * @description:
- */
+
 @Service
 public class HSBServiceImpl implements HSBService {
     private HSBMapper hsbMapper;

@@ -1,10 +1,6 @@
 package com.zcl.auth.chars.request;
 
-/**
- * @authoer:zengcl
- * @createDate:2023/5/18
- * @description:
- */
+
 public class ShowMainClassCharsRequest {
     private String baseType;
     private String villagesAndTowns;

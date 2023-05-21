@@ -6,11 +6,7 @@ import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.ResourceBundle;
 
-/**
- * @author zcl
- * @create 2021/7/25 18:30
- * @desc jedis工具类
- **/
+
 public class JedisUtil {
     private static JedisPool jedisPool = null;
     private static String host = null;
@@ -18,16 +14,12 @@ public class JedisUtil {
     private static int maxToal;
     private static int maxIdel;
 
-    /**
-     * 密码
-     */
+    
     private static String passWord;
-    /**
-     * 超时时间
-     */
+    
     private static Integer timeOut;
 
-    //初始化
+
     static {
         ResourceBundle redis = ResourceBundle.getBundle("redis");
         host = redis.getString("spring.redis.host");
@@ -43,30 +35,19 @@ public class JedisUtil {
         jedisPool = new JedisPool(jedisPoolConfig, host, port,timeOut,passWord);
     }
 
-    /**
-     * 获取JEDIS客户端
-     * @return
-     */
+    
     public static Jedis getJedis() {
         return jedisPool.getResource();
     }
 
-    /**
-     * 关闭jedis客户端
-     * @param jedis
-     */
+    
     public static void close(Jedis jedis) {
         if(jedis!=null){
             jedis.close();
         }
     }
 
-    /**
-     * 构建购物车key
-     * @param format
-     * @param args
-     * @return
-     */
+    
     public static String buildKey(String format,Object... args){
       return   String.format(format, args);
     }

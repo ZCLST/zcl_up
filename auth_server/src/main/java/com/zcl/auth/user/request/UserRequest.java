@@ -2,50 +2,26 @@ package com.zcl.auth.user.request;
 
 import javax.validation.constraints.NotBlank;
 
-/**
 
- * @author  zcl
-
- * @create  2021/12/21 20:45
-
- * @desc    用户request
-
- **/
 public class UserRequest {
-    /**
-     * 用户ID
-     */
+    
     private String uId;
-    /**
-     * 用户名称
-     */
+    
     @NotBlank(message = "uName不能为空")
     private String uName;
-    /**
-     * 用户密码
-     */
+    
     @NotBlank(message = "password不能为空")
     private String password;
-    /**
-     * 角色ID
-     */
+    
     @NotBlank(message = "rId不能为空")
     private String rId;
-    /**
-     * 性别
-     */
+    
     private String sex;
-    /**
-     * 手机号
-     */
+    
     private String phone;
-    /**
-     * 邮箱
-     */
+    
     private String email;
-    /**
-     * 0:正常 1:注销
-     */
+    
     private String status;
 
 

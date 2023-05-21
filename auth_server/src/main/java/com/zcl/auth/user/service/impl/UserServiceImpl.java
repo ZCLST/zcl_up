@@ -10,11 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * @author zcl
- * @create 2021/12/18 16:47
- * @desc 用户通用业务实现层
- **/
+
 @Service
 public class UserServiceImpl implements UserService {
     private UserMapper userMapper;

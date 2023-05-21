@@ -14,26 +14,14 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author zcl
- * @create 2021/12/18 16:36
- * @desc 用户业务层
- **/
+
 @Validated
 public interface UserBiz {
 
-    /**
-     * 校验用户登录
-     *
-     * @param loginRequest
-     * @return
-     */
+    
     Map checkUserLogin(@Valid LoginRequest loginRequest);
 
-    /**
-     * 用户登出
-     * @return
-     */
+    
     Map<String, Object> logOut();
 
 

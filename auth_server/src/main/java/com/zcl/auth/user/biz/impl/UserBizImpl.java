@@ -22,11 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * @author zcl
- * @create 2021/12/18 16:39
- * @desc 用户业务实现层
- **/
+
 @Service
 @Slf4j
 public class UserBizImpl implements UserBiz {
@@ -41,20 +37,20 @@ public class UserBizImpl implements UserBiz {
         try {
             String uName = loginRequest.getuName();
             String password = loginRequest.getPassword();
-            //对密码加密
+
             String md5Pw = MD5Util.EncoderByMd5(password);
-            //根据用户名、密码查询该用户是否存在
+
             User user = userService.findUserByNameAndPassWord(uName, md5Pw);
             boolean isExist = Optional.ofNullable(user).isPresent();
             if (isExist == false) {
                 throw new ZfException("用户名或密码错误");
             }
-            //用户名密码正确,判断redis里token是否存在，存在则刷新时间，不存在则新建
+
             String jwt = JwtUtil.createJWT(user.getuId());
             Jedis jedis = JedisUtil.getJedis();
             jedis.set(jwt, user.getuId());
             jedis.set(user.getuId(), user.getuName());
-            jedis.expire(jwt, JwtUtil.TTL_MILLIS);//设置token分钟过期时间
+            jedis.expire(jwt, JwtUtil.TTL_MILLIS);
             jedis.expire(user.getuId(), JwtUtil.TTL_MILLIS);
             return CommonResponse.setResponseData(jwt);
         } catch (NoSuchAlgorithmException e) {
@@ -71,7 +67,7 @@ public class UserBizImpl implements UserBiz {
 
     @Override
     public Map<String, Object> logOut() {
-        //清除redis缓存
+
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getHeader(SysCodeEnum.HEADER_NAME.getCode());
         Jedis jedis = JedisUtil.getJedis();
