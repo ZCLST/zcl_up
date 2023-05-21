@@ -3,15 +3,7 @@ package com.zcl.util.general.exception;
 
 import com.zcl.util.general.enums.ErrorCodeEnum;
 
-/**
 
- * @author  曾小白
-
- * @create  2021/7/21 10:30
-
- * @desc    自定义异常
-
- **/
 public class ZfException extends RuntimeException{
     //异常状态码
     private String code;
