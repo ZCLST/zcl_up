@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>basic_server</artifactId>
-    <!--    自定义es版本依赖-->
+    <!--自定义es版本依赖-->
     <properties>
         <elasticsearch.version>7.8.0</elasticsearch.version>
     </properties>
