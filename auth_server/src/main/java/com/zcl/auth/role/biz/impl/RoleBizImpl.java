@@ -72,8 +72,10 @@ public class RoleBizImpl implements RoleBiz {
         Role role = BeanUtil.convert(roleAddRequest, Role.class);
         String token = httpServletRequest.getHeader(SysCodeEnum.HEADER_NAME.getCode());
         String time = DateUtils.getNowTime();
-        Jedis jedis = JedisUtil.getJedis();
-        String uId = jedis.get(token);
+        String uId;
+        try (Jedis jedis = JedisUtil.getJedis()) {
+            uId = jedis.get(token);
+        }
         roleService.addRole(role);
     }
 

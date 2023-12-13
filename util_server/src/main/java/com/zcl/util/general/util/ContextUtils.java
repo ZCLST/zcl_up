@@ -16,16 +16,19 @@ import javax.servlet.http.HttpServletRequest;
 public class ContextUtils {
     /**
      * 获取userId
+     *
      * @return
      */
     public static String getUserId() {
         //获取当前用户ID
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getHeader(SysCodeEnum.HEADER_NAME.getCode());
-        Assert.hasLength(token,"token已过期！");
-        Jedis jedis = JedisUtil.getJedis();
-        String uId = jedis.get(token);
-        Assert.hasLength(uId,"uId已过期！");
+        Assert.hasLength(token, "token已过期！");
+        String uId;
+        try (Jedis jedis = JedisUtil.getJedis()) {
+            uId = jedis.get(token);
+        }
+        Assert.hasLength(uId, "uId已过期！");
         return uId;
     }
 }

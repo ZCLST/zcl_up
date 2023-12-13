@@ -69,8 +69,8 @@ public class LogOutAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
         String token = request.getHeader(SysCodeEnum.HEADER_NAME.getCode());
-        Jedis jedis = JedisUtil.getJedis();
-        String userId = jedis.get(token);
-        return userId;
+        try(Jedis jedis = JedisUtil.getJedis()){
+            return jedis.get(token);
+        }
     }
 }

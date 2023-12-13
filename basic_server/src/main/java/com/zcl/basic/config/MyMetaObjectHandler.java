@@ -9,6 +9,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -30,8 +31,11 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         String token = this.getRequestToken();
-        if(StringUtils.isNotBlank(token)){
-            String userId = JedisUtil.getJedis().get(token);
+        if (StringUtils.isNotBlank(token)) {
+            String userId;
+            try (Jedis jedis = JedisUtil.getJedis()) {
+                userId = jedis.get(token);
+            }
             if (metaObject.hasSetter(CREATE_USER)) {
                 this.setFieldValByName(CREATE_USER, userId, metaObject);
             }
@@ -44,8 +48,11 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         String token = this.getRequestToken();
-        if(StringUtils.isNotBlank(token)){
-            String userId = JedisUtil.getJedis().get(token);
+        if (StringUtils.isNotBlank(token)) {
+            String userId;
+            try (Jedis jedis = JedisUtil.getJedis()) {
+                userId = jedis.get(token);
+            }
             if (metaObject.hasSetter(UPDATE_USER)) {
                 this.setFieldValByName(UPDATE_USER, userId, metaObject);
             }

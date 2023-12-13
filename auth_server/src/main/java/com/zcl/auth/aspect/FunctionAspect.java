@@ -55,13 +55,14 @@ public class FunctionAspect {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
             String token = request.getHeader(SysCodeEnum.HEADER_NAME.getCode());
-            Jedis jedis = JedisUtil.getJedis();
-            String uId = jedis.get(token);
-            String functionName = logTypeEnum.getDesc();
-            LogDto logDto = new LogDto();
-            logDto.setAction(functionName);
-            logDto.setCreateUser(uId);
-            logFeignClient.saveLog(logDto);
+            try (Jedis jedis = JedisUtil.getJedis()) {
+                String uId = jedis.get(token);
+                String functionName = logTypeEnum.getDesc();
+                LogDto logDto = new LogDto();
+                logDto.setAction(functionName);
+                logDto.setCreateUser(uId);
+                logFeignClient.saveLog(logDto);
+            }
         }
         return proceed;
     }

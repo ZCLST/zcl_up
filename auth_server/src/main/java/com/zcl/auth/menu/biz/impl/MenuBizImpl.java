@@ -58,9 +58,11 @@ public class MenuBizImpl implements MenuBiz {
         if (StringUtils.isEmpty(token)) {
             throw new ZfException(ErrorCodeEnum.TIMEOUT.getDesc());
         }
-        Jedis jedis = JedisUtil.getJedis();
-        //获取uid
-        String uId = jedis.get(token);
+        String uId;
+        try (Jedis jedis = JedisUtil.getJedis()) {
+            //获取uid
+            uId = jedis.get(token);
+        }
         if (StringUtils.isEmpty(uId)) {
             throw new ZfException(ErrorCodeEnum.TIMEOUT.getDesc());
         }
@@ -154,8 +156,10 @@ public class MenuBizImpl implements MenuBiz {
             throw new ZfException("该URL已存在");
         }
         String token = httpServletRequest.getHeader(SysCodeEnum.HEADER_NAME.getCode());
-        Jedis jedis = JedisUtil.getJedis();
-        String uId = jedis.get(token);
+        String uId;
+        try (Jedis jedis = JedisUtil.getJedis()) {
+            uId = jedis.get(token);
+        }
         menu.setCreateTime(new Date());
         menu.setCreateUser(uId);
         menuService.addMenu(menu);
@@ -204,8 +208,10 @@ public class MenuBizImpl implements MenuBiz {
         //获取当前操作用户
         String token = httpServletRequest.getHeader(SysCodeEnum.HEADER_NAME.getCode());
         Assert.hasLength(token, "token已过期");
-        Jedis jedis = JedisUtil.getJedis();
-        String uId = jedis.get(token);
+        String uId;
+        try (Jedis jedis = JedisUtil.getJedis()) {
+            uId = jedis.get(token);
+        }
         menu.setmDesc(menuRequest.getmDesc());
         menu.setmIcon(menuRequest.getmIcon());
         menu.setIsNavigation(menuRequest.getIsNavigation());
