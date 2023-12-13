@@ -10,7 +10,7 @@ spring:
 #Mysql
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/zf?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&&failOverReadOnly=false
+    url: jdbc:mysql://127.0.0.1:3306/zf_master?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&&failOverReadOnly=false
     username: root
     password: root
 #持久层 mybatis-plus
