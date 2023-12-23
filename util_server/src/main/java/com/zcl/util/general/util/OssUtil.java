@@ -24,14 +24,14 @@ import java.io.InputStream;
 @Slf4j
 public abstract class OssUtil {
     public static final String GLOBAL_IMG_URL="https://zcl-test123.oss-cn-beijing.aliyuncs.com/798fddc17f2211eb973d6100d940b6cf/20220131/%E5%A5%B6%E8%8C%B6.jpg";
-    public static final String HEADER="http://zcl-test123.oss-cn-beijing.aliyuncs.com/";
+    public static final String HEADER="";
 
     private volatile static OSS ossClient;
     // Endpoint以杭州为例，其它Region请按实际情况填写。
-    private static final String END_POINT = "oss-cn-beijing.aliyuncs.com";
-    private static final String ACCESS_KEY_ID = "LTAI5tE1Fa4b74WEFj7UwUE2";
+    private static final String END_POINT = "";
+    private static final String ACCESS_KEY_ID = "";
     //"<yourAccessKeySecret>"
-    private static final String ACCESS_KEY_SECRET = "DSAWb7iKnYaZNDA6fIQ1uaBXUXuueH";
+    private static final String ACCESS_KEY_SECRET = "";
     //OSS 储存空间 bucket名字 "<yourBucketName>"
     private static final String BUCKET_NAME = "zcl-test123";
 
